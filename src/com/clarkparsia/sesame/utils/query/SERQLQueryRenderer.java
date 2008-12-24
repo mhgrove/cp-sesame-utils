@@ -192,7 +192,7 @@ public class SERQLQueryRenderer implements QueryRenderer {
 
             aBuffer.append("[").append(renderPathExpression(aExpr)).append("]");
 
-            if (aPathIter.hasNext())
+            if (aOptionalIter.hasNext())
                 aBuffer.append(",").append(BasicUtils.ENDL);
         }
 
