@@ -29,6 +29,7 @@ public class FOAF {
     public static final URI mbox = FACTORY.createURI(getURI().toString() + "mbox");
     public static final URI depicts = FACTORY.createURI(getURI().toString() + "depicts");
     public static final URI depiction = FACTORY.createURI(getURI().toString() + "depiction");
+    public static final URI maker = FACTORY.createURI(getURI().toString() + "maker");
 
     @Deprecated
     public static final URI regionDepicts = FACTORY.createURI(getURI().toString() + "regionDepicts");

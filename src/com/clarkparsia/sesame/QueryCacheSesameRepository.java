@@ -42,6 +42,7 @@ import java.util.ArrayList;
  * @author Michael Grove
  * @version 1.0
  */
+@Deprecated
 public class QueryCacheSesameRepository implements SesameRepository
 {
     private SesameRepository mRepository;
