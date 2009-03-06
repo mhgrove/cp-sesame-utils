@@ -22,6 +22,7 @@ public class FOAF {
     }
 
     public static final URI Person = FACTORY.createURI(getURI().toString() + "Person");
+    public static final URI Organization = FACTORY.createURI(getURI().toString() + "Organization");
     public static final URI Image = FACTORY.createURI(getURI().toString() + "Image");
 
     public static final URI firstName = FACTORY.createURI(getURI().toString() + "firstName");
@@ -30,6 +31,8 @@ public class FOAF {
     public static final URI depicts = FACTORY.createURI(getURI().toString() + "depicts");
     public static final URI depiction = FACTORY.createURI(getURI().toString() + "depiction");
     public static final URI maker = FACTORY.createURI(getURI().toString() + "maker");
+    public static final URI phone = FACTORY.createURI(getURI().toString() + "phone");
+    public static final URI fax = FACTORY.createURI(getURI().toString() + "fax");
 
     @Deprecated
     public static final URI regionDepicts = FACTORY.createURI(getURI().toString() + "regionDepicts");

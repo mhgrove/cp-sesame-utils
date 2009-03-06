@@ -36,6 +36,7 @@ import org.openrdf.sesame.query.QueryEvaluationException;
 
 import org.openrdf.sesame.config.AccessDeniedException;
 import org.openrdf.sesame.config.ConfigurationException;
+import org.openrdf.sesame.config.UnknownRepositoryException;
 
 import org.openrdf.rio.StatementHandler;
 import org.openrdf.rio.ParseException;
@@ -72,6 +73,14 @@ public class SesameUtils
 {
     private static final ValueFactory FACTORY = new ValueFactoryImpl();
 
+    public static SesameRepository createInMemSource() {
+        try {
+            return Sesame.getService().createRepository(BasicUtils.getRandomString(5), false);
+        }
+        catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     public static Set<Resource> getInstancesWithType(Graph theModel, Resource theType) {
         // TODO: this function is absurdly inefficient
@@ -283,6 +292,21 @@ public class SesameUtils
         aRDFParser.setStatementHandler(aHandler);
         aRDFParser.parse(theInput, theBase);
         return aGraph;
+    }
+
+    public static SesameRepository rdfToRepository(InputStream theInput, String theBase) throws IOException, ParseException, StatementHandlerException {
+        Graph aGraph = rdfToGraph(theInput, theBase);
+
+        try {
+            SesameRepository aRepo = Sesame.getService().createRepository("", false);
+            aRepo.addGraph(aGraph);
+
+            return aRepo;
+        }
+        catch (Exception e) {
+            // TODO: better error handling
+            throw new RuntimeException(e);
+        }
     }
 
     public static Graph ntriplesToGraph(InputStream theInput, String theBase) throws IOException, ParseException, StatementHandlerException {
