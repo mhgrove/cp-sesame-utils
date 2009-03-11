@@ -248,9 +248,9 @@ public class SesameUtils
     private static Set<URI> helpGetSubClassesOf(SesameRepository theRepo, URI theRes, boolean theDirect) throws IOException, AccessDeniedException, MalformedQueryException, QueryEvaluationException {
         HashSet<URI> aSubClasses = new HashSet<URI>();
 
-        String aQuery = "select ?sc where (?sc rdfs:subClassOf <" + theRes + ">)";
+        String aQuery = "select sc from {sc} rdfs:subClassOf {<" + theRes + ">}";
 
-        QueryResultsTable aTable = theRepo.performTableQuery(QueryLanguage.RDQL, aQuery);
+        QueryResultsTable aTable = theRepo.performTableQuery(QueryLanguage.SERQL, aQuery);
 
         for (int i = 0; i < aTable.getRowCount(); i++) {
             URI aSC = (URI)aTable.getValue(i,0);
