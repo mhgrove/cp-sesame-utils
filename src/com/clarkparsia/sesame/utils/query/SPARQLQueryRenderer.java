@@ -35,7 +35,7 @@ import org.openrdf.model.Value;
 import org.openrdf.model.BNode;
 import org.openrdf.model.Literal;
 
-import com.clarkparsia.utils.BasicUtils;
+import com.clarkparsia.utils.io.IOUtil;
 
 /**
  * Title: <br>
@@ -77,21 +77,27 @@ public class SPARQLQueryRenderer implements QueryRenderer {
     private static final String SPARQL_CONSTRUCT = "CONSTRUCT";
 
     public String render(Query theQuery) {
-        if (theQuery instanceof SelectQuery)
+        if (theQuery instanceof SelectQuery) {
             return serializeTableQuery( (SelectQuery) theQuery);
-        else if (theQuery instanceof ConstructQuery)
+        }
+        else if (theQuery instanceof ConstructQuery) {
             return serializeGraphQuery( (ConstructQuery) theQuery);
-        else if (theQuery instanceof Union)
+        }
+        else if (theQuery instanceof Union) {
             return union( (Union) theQuery);
-        else throw new IllegalArgumentException("NYI: can't render this query type");
+        }
+        else {
+            throw new IllegalArgumentException("NYI: can't render this query type");
+        }
     }
 
     private String serializeGraphQuery(ConstructQuery theGraphQuery) {
         StringBuffer aNewQuery = new StringBuffer(SPARQL_CONSTRUCT + " ");
 
         // i dont think this means anything here, but we'll include it just in case.
-        if (theGraphQuery.isDistinct())
+        if (theGraphQuery.isDistinct()) {
             aNewQuery.append(SPARQL_DISTINCT).append(" ");
+        }
 
         aNewQuery.append(" { ");
 
@@ -101,26 +107,29 @@ public class SPARQLQueryRenderer implements QueryRenderer {
 
             aNewQuery.append(serializeTriplePattern(aTriplePattern)).append(" ");
 
-            if (aConstructGraphIter.hasNext())
+            if (aConstructGraphIter.hasNext()) {
                 aNewQuery.append(". ");
+            }
         }
 
-        aNewQuery.append(" } ").append(BasicUtils.ENDL);
+        aNewQuery.append(" } ").append(IOUtil.ENDL);
 
         aNewQuery.append(SPARQL_WHERE);
-        aNewQuery.append(BasicUtils.ENDL);
+        aNewQuery.append(IOUtil.ENDL);
 
         GraphPattern aGraphPattern = theGraphQuery.getGraphPattern();
 
         aNewQuery.append(serializeGraphPattern(aGraphPattern));
 
-        aNewQuery.append(BasicUtils.ENDL);
+        aNewQuery.append(IOUtil.ENDL);
 
-        if (theGraphQuery.hasOffset())
-            aNewQuery.append(BasicUtils.ENDL).append(SPARQL_OFFSET).append(" ").append(theGraphQuery.getOffset());
+        if (theGraphQuery.hasOffset()) {
+            aNewQuery.append(IOUtil.ENDL).append(SPARQL_OFFSET).append(" ").append(theGraphQuery.getOffset());
+        }
 
-        if (theGraphQuery.hasLimit())
-            aNewQuery.append(BasicUtils.ENDL).append(SPARQL_LIMIT).append(" ").append(theGraphQuery.getLimit());
+        if (theGraphQuery.hasLimit()) {
+            aNewQuery.append(IOUtil.ENDL).append(SPARQL_LIMIT).append(" ").append(theGraphQuery.getLimit());
+        }
 
         return aNewQuery.toString();
     }
@@ -128,34 +137,34 @@ public class SPARQLQueryRenderer implements QueryRenderer {
     private String serializeTableQuery(SelectQuery theQuery) {
         StringBuffer aNewQuery = new StringBuffer(SPARQL_SELECT + " ");
 
-        if (theQuery.isDistinct())
+        if (theQuery.isDistinct()) {
             aNewQuery.append(SPARQL_DISTINCT).append(" ");
+        }
 
-        Set aVarList = new LinkedHashSet();
+        Set<Var> aVarList = new LinkedHashSet<Var>();
         theQuery.getProjectionVariables(aVarList);
 
-        Iterator aIter = aVarList.iterator();
-        while (aIter.hasNext()) {
-            Var aVariable = (Var) aIter.next();
-
+        for (Var aVariable : aVarList) {
             aNewQuery.append(SPARQL_VARIABLE).append(aVariable.getName()).append(" ");
         }
 
-        aNewQuery.append(BasicUtils.ENDL);
+        aNewQuery.append(IOUtil.ENDL);
         aNewQuery.append(SPARQL_WHERE).append(" ");
-        aNewQuery.append(BasicUtils.ENDL);
+        aNewQuery.append(IOUtil.ENDL);
 
         GraphPattern aGraphPattern = theQuery.getGraphPattern();
 
         aNewQuery.append(serializeGraphPattern(aGraphPattern));
 
-        aNewQuery.append(BasicUtils.ENDL);
+        aNewQuery.append(IOUtil.ENDL);
 
-        if (theQuery.hasOffset())
-            aNewQuery.append(BasicUtils.ENDL).append(SPARQL_OFFSET).append(" ").append(theQuery.getOffset());
+        if (theQuery.hasOffset()) {
+            aNewQuery.append(IOUtil.ENDL).append(SPARQL_OFFSET).append(" ").append(theQuery.getOffset());
+        }
 
-        if (theQuery.hasLimit())
-            aNewQuery.append(BasicUtils.ENDL).append(SPARQL_LIMIT).append(" ").append(theQuery.getLimit());
+        if (theQuery.hasLimit()) {
+            aNewQuery.append(IOUtil.ENDL).append(SPARQL_LIMIT).append(" ").append(theQuery.getLimit());
+        }
 
         return aNewQuery.toString();
     }
@@ -166,39 +175,39 @@ public class SPARQLQueryRenderer implements QueryRenderer {
         SelectQuery aLeftArg = (SelectQuery) theUnionQuery.getLeftArg();
         SelectQuery aRightArg = (SelectQuery) theUnionQuery.getRightArg();
 
-        if (aLeftArg.isDistinct() || aRightArg.isDistinct())
+        if (aLeftArg.isDistinct() || aRightArg.isDistinct()) {
             aNewQuery.append(SPARQL_DISTINCT).append(" ");
+        }
 
         // both left and right *should* select the same set of variables, serql doesnt require that, but i think the semantics
         // of sparql are different from serql (sparql one has one set of vars) so we'll assume for sanity's sake, and ease
         // or programming that we both sets of variables are the same
-        Set aVarList = new LinkedHashSet();
+        Set<Var> aVarList = new LinkedHashSet<Var>();
         aLeftArg.getProjectionVariables(aVarList);
 
-        Iterator aIter = aVarList.iterator();
-        while (aIter.hasNext()) {
-            Var aVariable = (Var) aIter.next();
-
+        for (Var aVariable : aVarList) {
             aNewQuery.append(SPARQL_VARIABLE).append(aVariable.getName()).append(" ");
         }
 
-        aNewQuery.append(BasicUtils.ENDL);
+        aNewQuery.append(IOUtil.ENDL);
         aNewQuery.append(SPARQL_WHERE).append(" {");
-        aNewQuery.append(BasicUtils.ENDL);
+        aNewQuery.append(IOUtil.ENDL);
 
         aNewQuery.append(serializeGraphPattern(aLeftArg.getGraphPattern()));
-        aNewQuery.append(BasicUtils.ENDL).append(SPARQL_UNION).append(BasicUtils.ENDL);
+        aNewQuery.append(IOUtil.ENDL).append(SPARQL_UNION).append(IOUtil.ENDL);
         aNewQuery.append(serializeGraphPattern(aRightArg.getGraphPattern()));
 
-        aNewQuery.append("}").append(BasicUtils.ENDL);
+        aNewQuery.append("}").append(IOUtil.ENDL);
 
         // again, we're going to assume that the left and right args of the serql union clause have the same offset/limit
         // as sparql only specifies one for the whole query
-        if (aLeftArg.hasOffset())
-            aNewQuery.append(BasicUtils.ENDL).append(SPARQL_OFFSET).append(" ").append(aLeftArg.getOffset());
+        if (aLeftArg.hasOffset()) {
+            aNewQuery.append(IOUtil.ENDL).append(SPARQL_OFFSET).append(" ").append(aLeftArg.getOffset());
+        }
 
-        if (aLeftArg.hasLimit())
-            aNewQuery.append(BasicUtils.ENDL).append(SPARQL_LIMIT).append(" ").append(aLeftArg.getLimit());
+        if (aLeftArg.hasLimit()) {
+            aNewQuery.append(IOUtil.ENDL).append(SPARQL_LIMIT).append(" ").append(aLeftArg.getLimit());
+        }
 
         return aNewQuery.toString();
     }
@@ -213,7 +222,7 @@ public class SPARQLQueryRenderer implements QueryRenderer {
             aBuffer.append(serializePathExpression(aExpression));
 
             aBuffer.append(SPARQL_PATH_SEP);
-            aBuffer.append(BasicUtils.ENDL);
+            aBuffer.append(IOUtil.ENDL);
         }
 
         aIter = theGraphPattern.getOptionals().iterator();
@@ -223,7 +232,7 @@ public class SPARQLQueryRenderer implements QueryRenderer {
             aBuffer.append(SPARQL_OPTIONAL + " ").append(serializePathExpression(aExpression)).append(" ");
 
             aBuffer.append(SPARQL_PATH_SEP);
-            aBuffer.append(BasicUtils.ENDL);
+            aBuffer.append(IOUtil.ENDL);
         }
 
         aIter = theGraphPattern.getConjunctiveConstraints().iterator();
@@ -232,11 +241,11 @@ public class SPARQLQueryRenderer implements QueryRenderer {
 
             aBuffer.append(SPARQL_FILTER + "(").append(serializeConstraint(aConstraint)).append(")");
             aBuffer.append(SPARQL_PATH_SEP);
-            aBuffer.append(BasicUtils.ENDL);
+            aBuffer.append(IOUtil.ENDL);
         }
 
         aBuffer.append("}");
-        aBuffer.append(BasicUtils.ENDL);
+        aBuffer.append(IOUtil.ENDL);
 
         return aBuffer.toString();
     }
@@ -278,8 +287,9 @@ public class SPARQLQueryRenderer implements QueryRenderer {
             if (aCompare.getLeftArg() instanceof Null || aCompare.getRightArg() instanceof Null) {
                 ValueExpr aExpr = aCompare.getLeftArg() instanceof Null ? aCompare.getRightArg() : aCompare.getLeftArg();
 
-                if (aCompare.getOperator() == ValueCompare.NE)
+                if (aCompare.getOperator() == ValueCompare.NE) {
                     aBuffer.append(SPARQL_NOT);
+                }
 
                 aBuffer.append(SPARQL_OP_BOUND).append("(").append(serializeValueExpr(aExpr)).append(")");
             }
@@ -313,48 +323,40 @@ public class SPARQLQueryRenderer implements QueryRenderer {
         else if (theConstraint instanceof IsBNode) {
             IsBNode aBNodeCompare = (IsBNode) theConstraint;
 
-            List aList = new ArrayList();
+            List<Var> aList = new ArrayList<Var>();
             aBNodeCompare.getVariables(aList);
 
-            for (int i = 0; i < aList.size(); i++) {
-                Var aVar = (Var) aList.get(i);
-
+            for (Var aVar : aList) {
                 aBuffer.append(SPARQL_OP_ISBLANK + "(" + SPARQL_VARIABLE).append(aVar.getName()).append(") ");
             }
         }
         else if (theConstraint instanceof IsResource) {
             IsResource aIsResourceCompare = (IsResource) theConstraint;
 
-            List aList = new ArrayList();
+            List<Var> aList = new ArrayList<Var>();
             aIsResourceCompare.getVariables(aList);
 
-            for (int i = 0; i < aList.size(); i++) {
-                Var aVar = (Var) aList.get(i);
-
+            for (Var aVar : aList) {
                 aBuffer.append("(" + SPARQL_OP_ISBLANK + "(" + SPARQL_VARIABLE).append(aVar.getName()).append(")  || " + SPARQL_OP_ISURI + "(" + SPARQL_VARIABLE).append(aVar.getName()).append("))");
             }
         }
         else if (theConstraint instanceof IsLiteral) {
             IsLiteral aIsLiteralCompare = (IsLiteral) theConstraint;
 
-            List aList = new ArrayList();
+            List<Var> aList = new ArrayList<Var>();
             aIsLiteralCompare.getVariables(aList);
 
-            for (int i = 0; i < aList.size(); i++) {
-                Var aVar = (Var) aList.get(i);
-
+            for (Var aVar : aList) {
                 aBuffer.append(SPARQL_OP_ISLITERAL + "(" + SPARQL_VARIABLE).append(aVar.getName()).append(") ");
             }
         }
         else if (theConstraint instanceof IsURI) {
             IsURI aIsURICompare = (IsURI) theConstraint;
 
-            List aList = new ArrayList();
+            List<Var> aList = new ArrayList<Var>();
             aIsURICompare.getVariables(aList);
 
-            for (int i = 0; i < aList.size(); i++) {
-                Var aVar = (Var) aList.get(i);
-
+            for (Var aVar : aList) {
                 aBuffer.append(SPARQL_OP_ISURI + "(" + SPARQL_VARIABLE).append(aVar.getName()).append(") ");
             }
         }
@@ -373,7 +375,9 @@ public class SPARQLQueryRenderer implements QueryRenderer {
 
             aBuffer.append(SPARQL_NOT).append(serializeConstraint(aNot.getArg()));
         }
-        else throw new UnsupportedOperationException("NYI: " + theConstraint.getClass());
+        else {
+            throw new UnsupportedOperationException("NYI: " + theConstraint.getClass());
+        }
 
         return aBuffer.toString();
     }
@@ -406,7 +410,9 @@ public class SPARQLQueryRenderer implements QueryRenderer {
         if (theVariable.getValue() != null) {
             aBuffer.append(getSPARQLQueryString(theVariable.getValue()));
         }
-        else aBuffer.append(SPARQL_VARIABLE).append(theVariable.getName());
+        else {
+            aBuffer.append(SPARQL_VARIABLE).append(theVariable.getName());
+        }
 
         return aBuffer.toString();
     }
@@ -418,13 +424,15 @@ public class SPARQLQueryRenderer implements QueryRenderer {
             org.openrdf.model.URI aURI = (org.openrdf.model.URI) theValue;
             aBuffer.append("<").append(aURI.getURI()).append(">");
         }
-        else if (theValue instanceof BNode)
+        else if (theValue instanceof BNode) {
             aBuffer.append("_:").append(((BNode)theValue).getID());
+        }
         else if (theValue instanceof Literal) {
             Literal aLit = (Literal)theValue;
             aBuffer.append("\"").append(escape(aLit.getLabel())).append(aLit.getLanguage() != null ? "@" + aLit.getLanguage() : "").append("\"");
-            if (aLit.getDatatype() != null)
+            if (aLit.getDatatype() != null) {
                 aBuffer.append("^^<").append(aLit.getDatatype().toString()).append(">");
+            }
         }
 
 

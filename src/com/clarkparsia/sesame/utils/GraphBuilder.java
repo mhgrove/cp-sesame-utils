@@ -31,6 +31,14 @@ public class GraphBuilder {
         mGraph.clear();
     }
 
+    public ResourceBuilder uri(URI theURI) {
+        return new ResourceBuilder(mGraph, mGraph.getValueFactory().createURI(theURI.getURI()));
+    }
+
+    public ResourceBuilder uri(String theURI) {
+        return instance(null, theURI);
+    }
+
     public ResourceBuilder instance(URI theType) {
         return instance(theType, null);
     }
@@ -40,7 +48,9 @@ public class GraphBuilder {
                         ? mGraph.getValueFactory().createBNode()
                         : mGraph.getValueFactory().createURI(theURI);
 
-        mGraph.add(aRes, URIImpl.RDF_TYPE, theType);
+        if (theType != null) {
+            mGraph.add(aRes, URIImpl.RDF_TYPE, theType);
+        }
 
         return new ResourceBuilder(mGraph, aRes);
     }

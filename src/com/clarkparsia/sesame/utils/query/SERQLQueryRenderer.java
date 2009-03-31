@@ -40,6 +40,7 @@ import org.openrdf.sesame.sail.query.Intersect;
 import org.openrdf.sesame.sail.query.Minus;
 import org.openrdf.sesame.sail.query.Union;
 import com.clarkparsia.utils.BasicUtils;
+import com.clarkparsia.utils.io.IOUtil;
 
 /**
  * Title: <br>
@@ -105,13 +106,13 @@ public class SERQLQueryRenderer implements QueryRenderer {
                 aQuery.append(", ");
         }
 
-        aQuery.append(BasicUtils.ENDL);
+        aQuery.append(IOUtil.ENDL);
 
-        aQuery.append("from").append(BasicUtils.ENDL);
+        aQuery.append("from").append(IOUtil.ENDL);
 
         aQuery.append(renderGraphPattern(theQuery.getGraphPattern()));
 
-        aQuery.append(BasicUtils.ENDL);
+        aQuery.append(IOUtil.ENDL);
 
         if (theQuery.hasLimit()) {
             aQuery.append(" limit ").append(theQuery.getLimit());
@@ -142,13 +143,13 @@ public class SERQLQueryRenderer implements QueryRenderer {
                 aQuery.append(", ");
         }
 
-        aQuery.append(BasicUtils.ENDL);
+        aQuery.append(IOUtil.ENDL);
 
-        aQuery.append("from").append(BasicUtils.ENDL);
+        aQuery.append("from").append(IOUtil.ENDL);
 
         aQuery.append(renderGraphPattern(theQuery.getGraphPattern()));
 
-        aQuery.append(BasicUtils.ENDL);
+        aQuery.append(IOUtil.ENDL);
 
         if (theQuery.hasLimit()) {
             aQuery.append(" limit ").append(theQuery.getLimit());
@@ -179,13 +180,13 @@ public class SERQLQueryRenderer implements QueryRenderer {
             aBuffer.append(renderPathExpression(aExpr));
 
             if (aPathIter.hasNext())
-                aBuffer.append(",").append(BasicUtils.ENDL);
+                aBuffer.append(",").append(IOUtil.ENDL);
         }
 
         Iterator aOptionalIter = thePattern.getOptionals().iterator();
 
         if (aOptionalIter.hasNext())
-            aBuffer.append(",").append(BasicUtils.ENDL);
+            aBuffer.append(",").append(IOUtil.ENDL);
 
         while (aOptionalIter.hasNext()) {
             PathExpression aExpr = (PathExpression) aOptionalIter.next();
@@ -193,11 +194,11 @@ public class SERQLQueryRenderer implements QueryRenderer {
             aBuffer.append("[").append(renderPathExpression(aExpr)).append("]");
 
             if (aOptionalIter.hasNext())
-                aBuffer.append(",").append(BasicUtils.ENDL);
+                aBuffer.append(",").append(IOUtil.ENDL);
         }
 
         if (thePattern.getRootConstraint() != null) {
-            aBuffer.append(BasicUtils.ENDL).append("where").append(BasicUtils.ENDL);
+            aBuffer.append(IOUtil.ENDL).append("where").append(IOUtil.ENDL);
 
             aBuffer.append(renderConstraint(thePattern.getRootConstraint()));
         }
