@@ -4,6 +4,8 @@ import org.openrdf.model.Resource;
 import org.openrdf.model.Graph;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
+import org.openrdf.model.impl.URIImpl;
+import org.openrdf.model.impl.GraphImpl;
 import org.openrdf.vocabulary.XmlSchema;
 
 /**
@@ -18,13 +20,32 @@ public class ResourceBuilder {
     private Graph mGraph;
     private Resource mRes;
 
+    public ResourceBuilder(Resource theRes) {
+        this(new GraphImpl(), theRes);
+    }
+
     ResourceBuilder(Graph theGraph, Resource theRes) {
         mRes = theRes;
         mGraph = theGraph;
     }
 
     public ResourceBuilder addProperty(URI theProperty, Value theValue) {
-        mGraph.add(mRes, theProperty, theValue);
+        if (theValue != null) {
+            mGraph.add(mRes, theProperty, theValue);
+        }
+
+        return this;
+    }
+
+    public Resource getResource() {
+        return mRes;
+    }
+
+    public ResourceBuilder addProperty(URI theProperty, ResourceBuilder theBuilder) {
+        if (theBuilder != null) {
+            addProperty(theProperty, theBuilder.getResource());
+            mGraph.add(theBuilder.mGraph);
+        }
 
         return this;
     }
@@ -66,5 +87,13 @@ public class ResourceBuilder {
     public ResourceBuilder addProperty(URI theProperty, boolean theValue) {
         return addProperty(theProperty, mGraph.getValueFactory().createLiteral(String.valueOf(theValue),
                                                                                mGraph.getValueFactory().createURI(XmlSchema.BOOLEAN)));
+    }
+
+    public ResourceBuilder addLabel(String theLabel) {
+        return addProperty(URIImpl.RDFS_LABEL, theLabel);
+    }
+
+    public ResourceBuilder addType(URI theType) {
+        return addProperty(URIImpl.RDF_TYPE, theType);
     }
 }
