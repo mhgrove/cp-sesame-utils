@@ -506,6 +506,10 @@ public class SesameUtils
         else return null;
     }
 
+    public static Literal getLiteral(SesameRepository theRepository, Resource theSubj, URI thePred) {
+        return (Literal) getValue(theRepository, theSubj, thePred);
+    }
+
     public static Literal getLiteral(Graph theGraph, Resource theSubj, URI thePred) {
         return (Literal) getValue(theGraph, theSubj, thePred);
     }

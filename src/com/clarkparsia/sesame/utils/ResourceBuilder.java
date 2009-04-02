@@ -41,6 +41,10 @@ public class ResourceBuilder {
         return mRes;
     }
 
+    public Graph graph() {
+        return mGraph;
+    }
+
     public ResourceBuilder addProperty(URI theProperty, ResourceBuilder theBuilder) {
         if (theBuilder != null) {
             addProperty(theProperty, theBuilder.getResource());
