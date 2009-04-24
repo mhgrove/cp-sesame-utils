@@ -55,7 +55,9 @@ import org.openrdf.sesame.Sesame;
 
 import org.openrdf.vocabulary.RDF;
 import com.clarkparsia.sesame.utils.query.SesameQueryUtils;
+import com.clarkparsia.sesame.repository.ExtendedSesameRepository;
 import com.clarkparsia.utils.BasicUtils;
+import com.clarkparsia.utils.CollectionUtil;
 
 /**
  * <p>Title: </p>
@@ -72,6 +74,14 @@ import com.clarkparsia.utils.BasicUtils;
 public class SesameUtils
 {
     private static final ValueFactory FACTORY = new ValueFactoryImpl();
+
+	public static ExtendedSesameRepository decorate(Graph theGraph) {
+		return decorate(sesameRepository(theGraph));
+	}
+
+	public static ExtendedSesameRepository decorate(SesameRepository theRepo) {
+		return new ExtendedSesameRepository(theRepo);
+	}
 
     public static SesameRepository createInMemSource() {
         try {
@@ -99,7 +109,7 @@ public class SesameUtils
 
                 Set aTypes = getTypes(aTempRepo, (URI) inst);
 
-                if (BasicUtils.containsAny(aTypes, types) && !filter.contains(inst)) {
+                if (CollectionUtil.containsAny(aTypes, types) && !filter.contains(inst)) {
                     filter.add(inst);
                 }
             }
@@ -229,6 +239,8 @@ public class SesameUtils
             URI aType = (URI)aTable.getValue(i,0);
 
             aTypes.add(aType);
+
+			// TODO: this is wrong, this should get all the superclasses of aType, not the other types of type.
             aTypes.addAll(getTypes(theRepo, aType));
         }
 
@@ -264,14 +276,26 @@ public class SesameUtils
         return aSubClasses;
     }
 
+	/**
+	 * @see SesameIO#readGraph
+	 */
+	@Deprecated
     public static Graph turtleToGraph(InputStream theInput, String theBase) throws IOException, ParseException, StatementHandlerException {
         return turtleToGraph(new InputStreamReader(theInput), theBase);
     }
 
+	/**
+	 * @see SesameIO#readGraph
+	 */
+	@Deprecated
     public static Graph turtleToGraph(String theTurtle, String theBase) throws IOException, ParseException, StatementHandlerException {
         return turtleToGraph(new StringReader(theTurtle), theBase);
     }
 
+	/**
+	 * @see SesameIO#readGraph
+	 */
+	@Deprecated
     public static Graph turtleToGraph(Reader theInput, String theBase) throws IOException, ParseException, StatementHandlerException {
         Graph aGraph = new GraphImpl();
         TurtleParser aRDFParser = new TurtleParser(aGraph.getValueFactory());
@@ -281,10 +305,18 @@ public class SesameUtils
         return aGraph;
     }
 
+	/**
+	 * @see SesameIO#readGraph
+	 */
+	@Deprecated
     public static Graph rdfToGraph(InputStream theInput, String theBase) throws IOException, ParseException, StatementHandlerException {
         return rdfToGraph(new InputStreamReader(theInput), theBase);
     }
 
+	/**
+	 * @see SesameIO#readGraph
+	 */
+	@Deprecated
     public static Graph rdfToGraph(Reader theInput, String theBase) throws IOException, ParseException, StatementHandlerException {
         Graph aGraph = new GraphImpl();
         RdfXmlParser aRDFParser = new RdfXmlParser(aGraph.getValueFactory());
@@ -294,6 +326,10 @@ public class SesameUtils
         return aGraph;
     }
 
+	/**
+	 * @see SesameIO.readRepository
+	 */
+	@Deprecated
     public static SesameRepository rdfToRepository(InputStream theInput, String theBase) throws IOException, ParseException, StatementHandlerException {
         Graph aGraph = rdfToGraph(theInput, theBase);
 
@@ -309,14 +345,26 @@ public class SesameUtils
         }
     }
 
+	/**
+	 * @see SesameIO#readGraph
+	 */
+	@Deprecated
     public static Graph ntriplesToGraph(InputStream theInput, String theBase) throws IOException, ParseException, StatementHandlerException {
         return ntriplesToGraph(new InputStreamReader(theInput), theBase);
     }
 
+	/**
+	 * @see SesameIO#readGraph
+	 */
+	@Deprecated
     public static Graph ntriplesToGraph(String theInput, String theBase) throws IOException, ParseException, StatementHandlerException {
         return ntriplesToGraph(new StringReader(theInput), theBase);
     }
 
+	/**
+	 * @see SesameIO#readGraph
+	 */
+	@Deprecated
     public static Graph ntriplesToGraph(Reader theInput, String theBase) throws IOException, ParseException, StatementHandlerException {
         Graph aGraph = new GraphImpl();
         NTriplesParser aRDFParser = new NTriplesParser(aGraph.getValueFactory());
@@ -368,6 +416,10 @@ public class SesameUtils
         }
     }
 
+	/**
+	 * @see SesameIO.writeGraph
+	 */
+	@Deprecated
     public static String graphAsRDF(Graph theGraph) throws IOException {
         StringWriter aWriter = new StringWriter();
 
@@ -378,6 +430,10 @@ public class SesameUtils
         return aWriter.toString();
     }
 
+	/**
+	 * @see SesameIO.writeGraph
+	 */
+	@Deprecated
     public static String graphAsTurtle(Graph theGraph) throws IOException {
         StringWriter aWriter = new StringWriter();
 
@@ -388,6 +444,10 @@ public class SesameUtils
         return aWriter.toString();
     }
 
+	/**
+	 * @see SesameIO.writeGraph
+	 */
+	@Deprecated
     private static void writeGraph(Graph theGraph, RdfDocumentWriter theWriter) throws IOException {
         theWriter.startDocument();
         StatementIterator sIter = theGraph.getStatements();

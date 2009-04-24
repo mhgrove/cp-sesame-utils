@@ -1,4 +1,4 @@
-package com.clarkparsia.sesame.sail.convert.impl;
+package com.clarkparsia.sesame.repository.convert.impl;
 
 import org.openrdf.sesame.sail.RdfRepository;
 import org.openrdf.sesame.sail.StatementIterator;
@@ -20,7 +20,7 @@ import com.clarkparsia.sesame.utils.BuildRepositoryStatementHandler;
 import com.clarkparsia.sesame.vocabulary.DC;
 import com.clarkparsia.sesame.vocabulary.FOAF;
 import com.clarkparsia.sesame.vocabulary.MusicOntology;
-import com.clarkparsia.sesame.sail.convert.Converter;
+import com.clarkparsia.sesame.repository.convert.Converter;
 
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.DocumentBuilder;

@@ -1,4 +1,4 @@
-package com.clarkparsia.sesame.sail.convert;
+package com.clarkparsia.sesame.repository.convert;
 
 import org.openrdf.rio.StatementHandler;
 

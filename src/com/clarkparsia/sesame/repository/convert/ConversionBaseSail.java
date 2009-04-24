@@ -1,14 +1,11 @@
-package com.clarkparsia.sesame.sail.convert;
+package com.clarkparsia.sesame.repository.convert;
 
-import org.openrdf.sesame.sail.RdfSource;
 import org.openrdf.sesame.sail.StatementIterator;
 import org.openrdf.sesame.sail.NamespaceIterator;
 import org.openrdf.sesame.sail.SailInitializationException;
 import org.openrdf.sesame.sail.RdfRepository;
 import org.openrdf.sesame.sail.SailUpdateException;
 import org.openrdf.sesame.sail.SailChangedListener;
-import org.openrdf.sesame.sail.SailChangedEvent;
-import org.openrdf.sesame.sail.Namespace;
 import org.openrdf.sesame.sail.util.EmptyStatementIterator;
 import org.openrdf.sesame.sail.util.SingleStatementIterator;
 import org.openrdf.sesame.sail.util.SailChangedEventImpl;
@@ -19,7 +16,6 @@ import org.openrdf.model.Resource;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.impl.ValueFactoryImpl;
-import org.openrdf.rio.StatementHandler;
 import org.openrdf.vocabulary.XmlSchema;
 
 import java.util.Map;
@@ -30,7 +26,6 @@ import java.util.List;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import java.util.HashMap;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.concurrent.locks.Lock;
 import java.net.URL;
