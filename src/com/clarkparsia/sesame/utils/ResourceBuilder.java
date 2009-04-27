@@ -55,8 +55,13 @@ public class ResourceBuilder {
     }
 
     public ResourceBuilder addProperty(URI theProperty, String theValue) {
-        return addProperty(theProperty, mGraph.getValueFactory().createLiteral(theValue,
-                                                                               mGraph.getValueFactory().createURI(XmlSchema.STRING)));
+		if (theValue != null) {
+			return addProperty(theProperty, mGraph.getValueFactory().createLiteral(theValue,
+																				   mGraph.getValueFactory().createURI(XmlSchema.STRING)));
+		}
+		else {
+			return this;
+		}
     }
 
     public ResourceBuilder addProperty(URI theProperty, int theValue) {
