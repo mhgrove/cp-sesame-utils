@@ -11,7 +11,7 @@ import org.openrdf.model.URI;
  * @author Michael Grove <mike@clarkparsia.com>
  */
 public class VCard extends Vocabulary {
-    private static final VCard VOCAB = new VCard("http://www.w3.org/2001/vcard-rdf/3.0#");
+    private static final VCard VOCAB = new VCard("http://www.w3.org/2006/vcard/ns#");
 
     private VCard(String theURI) {
         super(theURI);
@@ -21,8 +21,19 @@ public class VCard extends Vocabulary {
         return VOCAB;
     }
 
-    public final URI ADR = term("ADR");
+    public final URI Address = term("Address");
+
+	public final URI street_address = term("street-address");
+	public final URI locality = term("locality");
+	public final URI region = term("region");
+	public final URI postal_code = term("postal-code");
+
+	@Deprecated
     public final URI Street = term("Street");
+
+	@Deprecated
     public final URI Locality = term("Locality");
+
+	@Deprecated
     public final URI Region = term("Region");
 }
