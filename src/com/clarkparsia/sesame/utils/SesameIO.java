@@ -3,6 +3,9 @@ package com.clarkparsia.sesame.utils;
 import org.openrdf.sesame.constants.RDFFormat;
 import org.openrdf.sesame.repository.SesameRepository;
 import org.openrdf.sesame.admin.DummyAdminListener;
+import org.openrdf.sesame.admin.StdOutAdminListener;
+import org.openrdf.sesame.admin.AdminMsgCollector;
+import org.openrdf.sesame.admin.AdminMsg;
 import org.openrdf.sesame.config.AccessDeniedException;
 import org.openrdf.sesame.sail.StatementIterator;
 import org.openrdf.model.Graph;
@@ -63,7 +66,17 @@ public class SesameIO {
 		SesameRepository aRepo = SesameUtils.createInMemSource();
 
 		try {
-			aRepo.addData(theReader, "", theFormat, true, new DummyAdminListener());
+			AdminMsgCollector aCollector = new AdminMsgCollector();
+			aRepo.addData(theReader, "", theFormat, true, aCollector);
+			if (aCollector.getErrors().size() > 0) {
+				StringBuffer aBuffer = new StringBuffer();
+				for (Object aObj : aCollector.getErrors()) {
+					AdminMsg aMsg = (AdminMsg) aObj;
+					aBuffer.append("[").append(aMsg.getLineNo()).append(":").append(aMsg.getColumnNo()).append("] ").append(aMsg.getMessage()).append("\n");
+				}
+
+				throw new IOException(aBuffer.toString());
+			}
 		}
 		catch (AccessDeniedException e) {
 			throw new IOException(e.getMessage());

@@ -460,13 +460,14 @@ public class SesameUtils
         sIter.close();
     }
 
-    public static StatementIterator getStatements(SesameRepository theRepo, Resource theSubj, URI thePred, Value theObj) {
+    public static StmtIterator getStatements(SesameRepository theRepo, Resource theSubj, URI thePred, Value theObj) {
         String aQuery = "construct * from {s} p {o} ";
 
 
         try {
-            if (theSubj != null || thePred != null || theObj != null)
+            if (theSubj != null || thePred != null || theObj != null) {
                 aQuery += " where ";
+			}
 
             boolean needsAnd = false;
             if (theSubj != null) {
@@ -475,23 +476,25 @@ public class SesameUtils
             }
 
             if (thePred != null) {
-                if (needsAnd)
+                if (needsAnd) {
                     aQuery += " and ";
+				}
                 aQuery += " (p = "+ SesameQueryUtils.getQueryString(thePred)+") ";
                 needsAnd = true;
             }
 
             if (theObj != null) {
-                if (needsAnd)
+                if (needsAnd) {
                     aQuery += " and ";
+				}
                 aQuery += " (o = "+ SesameQueryUtils.getQueryString(theObj)+")";
             }
-            return theRepo.performGraphQuery(QueryLanguage.SERQL, aQuery).getStatements();
+
+            return new StmtIterator(theRepo.performGraphQuery(QueryLanguage.SERQL, aQuery).getStatements());
         }
         catch (Exception ex) {
-            System.err.println("bad query: "+aQuery);
             ex.printStackTrace();
-            return new org.openrdf.model.impl.GraphImpl().getStatements();
+            return new StmtIterator();
         }
     }
 

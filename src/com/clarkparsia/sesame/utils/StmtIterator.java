@@ -4,9 +4,13 @@ import java.util.Iterator;
 import java.util.Collections;
 import java.util.List;
 import java.util.Arrays;
+import java.util.ArrayList;
 
 import org.openrdf.sesame.sail.StatementIterator;
 import org.openrdf.model.Statement;
+import org.openrdf.model.Graph;
+import org.openrdf.model.impl.GraphImpl;
+import com.clarkparsia.utils.CollectionUtil;
 
 /**
  * Title: <br>
@@ -16,19 +20,35 @@ import org.openrdf.model.Statement;
  *
  * @author Michael Grove <mhgrove@hotmail.com>
  */
-public class StmtIterator implements StatementIterator
+public class StmtIterator implements StatementIterator, Iterator<Statement>, Iterable<Statement>
 {
-    private Iterator mIter;
+    private Iterator<Statement> mIter;
 
     public StmtIterator() {
-        mIter = Collections.EMPTY_LIST.iterator();
+		List<Statement> aList = Collections.emptyList();
+        mIter = aList.iterator();
     }
 
-    public StmtIterator(Iterator theIter) {
+	public StmtIterator(StatementIterator theIter) {
+		this();
+
+		// TODO: this is not efficient if sesame was good about keeping a cursor and using a fetching result set
+		// because this requires the entire statement iterator to be kept in memory, and if it was pulling from
+		// something that was fetching things from the repo as they were requested, you'd lose that benefit.
+
+		List<Statement> aList = new ArrayList<Statement>();
+		while (theIter.hasNext()) {
+			aList.add(theIter.next());
+		}
+
+		mIter = aList.iterator();
+	}
+
+    public StmtIterator(Iterator<Statement> theIter) {
         mIter = theIter;
     }
 
-    public StmtIterator(List theList) {
+    public StmtIterator(List<Statement> theList) {
         this(theList.iterator());
     }
 
@@ -44,6 +64,24 @@ public class StmtIterator implements StatementIterator
     }
 
     public Statement next() {
-        return (Statement)mIter.next();
+        return mIter.next();
     }
+
+	public void remove() {
+		throw new UnsupportedOperationException();
+	}
+
+	public Iterator<Statement> iterator() {
+		return this;
+	}
+
+	public Graph asGraph() {
+		Graph aGraph = new GraphImpl();
+
+		while (hasNext()) {
+			aGraph.add(next());
+		}
+
+		return aGraph;
+	}
 }
