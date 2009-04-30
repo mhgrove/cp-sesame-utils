@@ -35,8 +35,6 @@ import org.openrdf.sesame.query.MalformedQueryException;
 import org.openrdf.sesame.query.QueryEvaluationException;
 
 import org.openrdf.sesame.config.AccessDeniedException;
-import org.openrdf.sesame.config.ConfigurationException;
-import org.openrdf.sesame.config.UnknownRepositoryException;
 
 import org.openrdf.rio.StatementHandler;
 import org.openrdf.rio.ParseException;
@@ -91,6 +89,16 @@ public class SesameUtils
             throw new RuntimeException(e);
         }
     }
+
+	public static Graph asGraph(Statement... theStatements) {
+		Graph aGraph = new GraphImpl();
+
+		for (Statement aStmt : theStatements) {
+			aGraph.add(aStmt);
+		}
+
+		return aGraph;
+	}
 
     public static Set<Resource> getInstancesWithType(Graph theModel, Resource theType) {
         // TODO: this function is absurdly inefficient

@@ -2,23 +2,33 @@ package com.clarkparsia.sesame.repository;
 
 import org.openrdf.sesame.repository.SesameRepository;
 import org.openrdf.sesame.constants.QueryLanguage;
+import org.openrdf.sesame.constants.RDFFormat;
 import org.openrdf.sesame.config.AccessDeniedException;
 import org.openrdf.sesame.query.MalformedQueryException;
 import org.openrdf.sesame.query.QueryEvaluationException;
 import org.openrdf.sesame.sail.StatementIterator;
+import org.openrdf.sesame.admin.StdOutAdminListener;
 import org.openrdf.model.Value;
 import org.openrdf.model.URI;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.Graph;
+import org.openrdf.util.io.IOUtil;
+import org.openrdf.rio.ParseException;
 
 import com.clarkparsia.sesame.utils.SesameUtils;
+import com.clarkparsia.sesame.utils.SesameIO;
 import com.clarkparsia.sesame.utils.query.IterableQueryResultsTable;
 import com.clarkparsia.sesame.utils.query.SesameQuery;
 import com.clarkparsia.utils.CollectionUtil;
 
 import java.util.Iterator;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
+import java.io.InputStreamReader;
+import java.io.InputStream;
 
 /**
  * Title: <br/>
@@ -74,6 +84,39 @@ public class ExtendedSesameRepository extends BaseSesameRepository implements Se
 		// TODO: need a null check for theURI
 		// TODO: make this align closer to a SPARQL describe
 		return SesameUtils.getStatements(this, theURI, null, null).asGraph();
+	}
+
+	public void write(OutputStream theStream, RDFFormat theFormat) throws IOException {
+		write(new OutputStreamWriter(theStream), theFormat);
+	}
+
+	public void write(Writer theStream, RDFFormat theFormat) throws IOException {
+		try {
+			IOUtil.transfer(new InputStreamReader(extractRDF(theFormat, true, true, true, true)), theStream);
+
+			theStream.flush();
+		}
+		catch (AccessDeniedException e) {
+			throw new IOException(e.getMessage());
+		}
+	}
+
+	public void add(Statement... theStatement) throws IOException {
+		try {
+			addGraph(SesameUtils.asGraph(theStatement));
+		}
+		catch (AccessDeniedException e) {
+			throw new IOException(e.getMessage());
+		}
+	}
+
+	public void read(InputStream theStream, RDFFormat theFormat) throws IOException, ParseException {
+		try {
+			addData(SesameIO.readRepository(theStream, theFormat), new StdOutAdminListener());
+		}
+		catch (AccessDeniedException e) {
+			throw new RuntimeException(e);
+		}
 	}
 
 	// TODO: add an ask method
