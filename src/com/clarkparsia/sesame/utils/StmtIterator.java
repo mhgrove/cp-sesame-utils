@@ -44,6 +44,10 @@ public class StmtIterator implements StatementIterator, Iterator<Statement>, Ite
 		mIter = aList.iterator();
 	}
 
+	public StmtIterator(Iterable<Statement> theIter) {
+		this(theIter.iterator());
+	}
+
     public StmtIterator(Iterator<Statement> theIter) {
         mIter = theIter;
     }
