@@ -4,13 +4,11 @@ import java.util.Iterator;
 import java.util.Collections;
 import java.util.List;
 import java.util.Arrays;
-import java.util.ArrayList;
 
 import org.openrdf.sesame.sail.StatementIterator;
 import org.openrdf.model.Statement;
 import org.openrdf.model.Graph;
 import org.openrdf.model.impl.GraphImpl;
-import com.clarkparsia.utils.CollectionUtil;
 
 /**
  * Title: <br>
@@ -30,18 +28,18 @@ public class StmtIterator implements StatementIterator, Iterator<Statement>, Ite
     }
 
 	public StmtIterator(StatementIterator theIter) {
-		this();
+		this(new StatementIteratorAsIterator(theIter));
 
-		// TODO: this is not efficient if sesame was good about keeping a cursor and using a fetching result set
-		// because this requires the entire statement iterator to be kept in memory, and if it was pulling from
-		// something that was fetching things from the repo as they were requested, you'd lose that benefit.
-
-		List<Statement> aList = new ArrayList<Statement>();
-		while (theIter.hasNext()) {
-			aList.add(theIter.next());
-		}
-
-		mIter = aList.iterator();
+//		// TODO: this is not efficient if sesame was good about keeping a cursor and using a fetching result set
+//		// because this requires the entire statement iterator to be kept in memory, and if it was pulling from
+//		// something that was fetching things from the repo as they were requested, you'd lose that benefit.
+//
+//		List<Statement> aList = new ArrayList<Statement>();
+//		while (theIter.hasNext()) {
+//			aList.add(theIter.next());
+//		}
+//
+//		mIter = aList.iterator();
 	}
 
 	public StmtIterator(Iterable<Statement> theIter) {

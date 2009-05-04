@@ -13,6 +13,7 @@ import org.openrdf.model.URI;
 import org.openrdf.model.Resource;
 import org.openrdf.model.Statement;
 import org.openrdf.model.Graph;
+import org.openrdf.model.Literal;
 import org.openrdf.util.io.IOUtil;
 import org.openrdf.rio.ParseException;
 
@@ -117,6 +118,14 @@ public class ExtendedSesameRepository extends BaseSesameRepository implements Se
 		catch (AccessDeniedException e) {
 			throw new RuntimeException(e);
 		}
+	}
+
+	public Value getValue(Resource theSubj, URI thePred) {
+		return SesameUtils.getValue(this, theSubj, thePred);
+	}
+
+	public Literal getLiteral(Resource theSubj, URI thePred) {
+		return (Literal) getValue(theSubj, thePred);
 	}
 
 	// TODO: add an ask method
