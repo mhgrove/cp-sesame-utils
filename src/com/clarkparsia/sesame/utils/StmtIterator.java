@@ -29,17 +29,6 @@ public class StmtIterator implements StatementIterator, Iterator<Statement>, Ite
 
 	public StmtIterator(StatementIterator theIter) {
 		this(new StatementIteratorAsIterator(theIter));
-
-//		// TODO: this is not efficient if sesame was good about keeping a cursor and using a fetching result set
-//		// because this requires the entire statement iterator to be kept in memory, and if it was pulling from
-//		// something that was fetching things from the repo as they were requested, you'd lose that benefit.
-//
-//		List<Statement> aList = new ArrayList<Statement>();
-//		while (theIter.hasNext()) {
-//			aList.add(theIter.next());
-//		}
-//
-//		mIter = aList.iterator();
 	}
 
 	public StmtIterator(Iterable<Statement> theIter) {

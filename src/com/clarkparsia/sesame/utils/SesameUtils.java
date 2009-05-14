@@ -53,6 +53,8 @@ import org.openrdf.sesame.Sesame;
 
 import org.openrdf.vocabulary.RDF;
 import com.clarkparsia.sesame.utils.query.SesameQueryUtils;
+import com.clarkparsia.sesame.utils.query.Binding;
+import com.clarkparsia.sesame.utils.query.IterableQueryResultsTable;
 import com.clarkparsia.sesame.repository.ExtendedSesameRepository;
 import com.clarkparsia.utils.BasicUtils;
 import com.clarkparsia.utils.CollectionUtil;
@@ -106,17 +108,17 @@ public class SesameUtils
 
         try {
             SesameRepository aTempRepo = sesameRepository(theModel);
-            Set types = getSubClassesOf(aTempRepo, (URI) theType, false);
+            Set<Resource> types = getSubClassesOf(aTempRepo, theType, false);
 
             types.add(theType);
 
-            Iterator iter = listIndividuals(theModel);
+            Iterator<Resource> iter = listIndividuals(theModel);
 
             while (iter.hasNext()) {
-                Resource inst = (Resource)iter.next();
+                Resource inst = iter.next();
 
-                Set aTypes = getTypes(aTempRepo, (URI) inst);
-
+                Set<Resource> aTypes = getTypes(aTempRepo, inst);
+				
                 if (CollectionUtil.containsAny(aTypes, types) && !filter.contains(inst)) {
                     filter.add(inst);
                 }
@@ -222,6 +224,11 @@ public class SesameUtils
 		return theURI.substring( 0, aIndex );
 	}
 
+	/**
+	 * Returns the graph as a sesame repository
+	 * @param theGraph the graph to convert to a SesameRepository
+	 * @return a sesame repository with the same set of statements as the graph
+	 */
     public static SesameRepository sesameRepository(Graph theGraph) {
         try {
             SesameRepository aRepo = Sesame.getService().createRepository("test-"+System.currentTimeMillis(), false);
@@ -236,15 +243,25 @@ public class SesameUtils
         }
     }
 
-    public static Set<Resource> getTypes(SesameRepository theRepo, URI theRes) throws IOException, AccessDeniedException, MalformedQueryException, QueryEvaluationException {
-        HashSet<Resource> aTypes = new HashSet<Resource>();
+	/**
+	 * Returns all the types belonging to the given instance
+	 * @param theRepo the repository to query
+	 * @param theRes the instance whose types we want to get
+	 * @return the set of types for the given resource
+	 * @throws IOException thrown if there is an error while querying
+	 * @throws AccessDeniedException thrown if you cannot access the given repository
+	 * @throws MalformedQueryException thrown if there is an error while querying
+	 * @throws QueryEvaluationException thrown if there is an error while querying
+	 */
+    public static Set<Resource> getTypes(SesameRepository theRepo, Resource theRes) throws IOException, AccessDeniedException, MalformedQueryException, QueryEvaluationException {
+        Set<Resource> aTypes = new HashSet<Resource>();
 
-        String aQuery = "select aType from {<" + theRes + ">} rdf:type {aType}";
+        String aQuery = "select aType from {" + SesameQueryUtils.getQueryString(theRes) + "} rdf:type {aType}";
 
         QueryResultsTable aTable = theRepo.performTableQuery(QueryLanguage.SERQL, aQuery);
 
-        for (int i = 0; i < aTable.getRowCount(); i++) {
-            URI aType = (URI)aTable.getValue(i,0);
+        for (Binding aBinding : IterableQueryResultsTable.iterable(aTable)) {
+            Resource aType = aBinding.getResource("aType");
 
             aTypes.add(aType);
 
@@ -255,25 +272,26 @@ public class SesameUtils
         return aTypes;
     }
 
-    private static Set<URI> mProcessedClassList = new HashSet<URI>();
-    public static Set<URI> getSubClassesOf(SesameRepository theRepo, URI theRes) throws IOException, AccessDeniedException, MalformedQueryException, QueryEvaluationException {
+    private static Set<Resource> mProcessedClassList = new HashSet<Resource>();
+    public static Set<Resource> getSubClassesOf(SesameRepository theRepo, Resource theRes) throws IOException, AccessDeniedException, MalformedQueryException, QueryEvaluationException {
         return getSubClassesOf(theRepo, theRes, false);
     }
 
-    public static Set<URI> getSubClassesOf(SesameRepository theRepo, URI theRes, boolean theDirect) throws IOException, AccessDeniedException, MalformedQueryException, QueryEvaluationException {
-        mProcessedClassList = new HashSet<URI>();
+    public static Set<Resource> getSubClassesOf(SesameRepository theRepo, Resource theRes, boolean theDirect) throws IOException, AccessDeniedException, MalformedQueryException, QueryEvaluationException {
+        mProcessedClassList = new HashSet<Resource>();
         return helpGetSubClassesOf(theRepo, theRes, theDirect);
     }
 
-    private static Set<URI> helpGetSubClassesOf(SesameRepository theRepo, URI theRes, boolean theDirect) throws IOException, AccessDeniedException, MalformedQueryException, QueryEvaluationException {
-        HashSet<URI> aSubClasses = new HashSet<URI>();
+    private static Set<Resource> helpGetSubClassesOf(SesameRepository theRepo, Resource theRes, boolean theDirect) throws IOException, AccessDeniedException, MalformedQueryException, QueryEvaluationException {
+        Set<Resource> aSubClasses = new HashSet<Resource>();
 
-        String aQuery = "select sc from {sc} rdfs:subClassOf {<" + theRes + ">}";
+        String aQuery = "select sc from {sc} rdfs:subClassOf {" + SesameQueryUtils.getQueryString(theRes) + "}";
 
         QueryResultsTable aTable = theRepo.performTableQuery(QueryLanguage.SERQL, aQuery);
 
-        for (int i = 0; i < aTable.getRowCount(); i++) {
-            URI aSC = (URI)aTable.getValue(i,0);
+		for (Binding aBinding : IterableQueryResultsTable.iterable(aTable)) {
+            Resource aSC = aBinding.getResource("sc");
+
             aSubClasses.add(aSC);
 
             if (!theDirect && !mProcessedClassList.contains(aSC)) {
@@ -382,6 +400,10 @@ public class SesameUtils
         return aGraph;
     }
 
+	/**
+	 * @see SesameIO#readGraph
+	 */
+	@Deprecated
     public static Graph rdfToGraph(String theRDF, String theBase) throws IOException, ParseException, StatementHandlerException {
         Graph aGraph = new GraphImpl();
         RdfXmlParser aRDFParser = new RdfXmlParser(aGraph.getValueFactory());
@@ -391,8 +413,7 @@ public class SesameUtils
         return aGraph;
     }
 
-    public static Graph tableToGraph(QueryResultsTable theResults)
-    {
+    public static Graph tableToGraph(QueryResultsTable theResults) {
         try {
             Graph aGraph = new GraphImpl();
 
@@ -627,7 +648,7 @@ public class SesameUtils
     }
 
     public static URI getType(SesameRepository theRepo, Resource theRes) {
-        return (URI)getValue(theRepo, theRes, FACTORY.createURI(RDF.TYPE));
+        return (URI) getValue(theRepo, theRes, FACTORY.createURI(RDF.TYPE));
     }
 
     public static Iterator<Resource> getSubjects(SesameRepository theRepo, URI thePred, Value theObject) {
