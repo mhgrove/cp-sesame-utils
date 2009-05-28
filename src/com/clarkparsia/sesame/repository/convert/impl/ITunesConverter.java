@@ -105,7 +105,7 @@ public class ITunesConverter implements Converter {
 
                 // TODO: create the URI from the music brainz id?
                 // TODO: can i get location information from dbtune.org?
-                URI aSubj = makeURI(get(aTrack, Key.Name));
+                URI aSubj = makeURI(i+"/track", get(aTrack, Key.Name));
                 
                 aGraph.add(aSubj, URIImpl.RDF_TYPE, MusicOntology.Track);
 
@@ -183,13 +183,17 @@ public class ITunesConverter implements Converter {
                     aGraph.add(album(aValue), MusicOntology.release_type, MusicOntology.album);
                     // TODO: is this the correct type?
                     aGraph.add(album(aValue), URIImpl.RDF_TYPE, MusicOntology.Record);
+					aGraph.add(album(aValue), URIImpl.RDFS_LABEL, aGraph.getValueFactory().createLiteral(aValue,
+                                                                                                          aGraph.getValueFactory().createURI(XmlSchema.STRING)));
+					aGraph.add(album(aValue), DC.title, aGraph.getValueFactory().createLiteral(aValue,
+                                                                                                          aGraph.getValueFactory().createURI(XmlSchema.STRING)));
                 }
 
                 aValue = get(aTrack, Key.Artist);
                 if (aValue != null) {
                     String aAlbum = get(aTrack, Key.Album);
 
-                    aGraph.add(album(aValue), FOAF.maker, artist(aAlbum));
+                    aGraph.add(album(aAlbum), FOAF.maker, artist(aValue));
                     aGraph.add(artist(aValue), URIImpl.RDF_TYPE, MusicOntology.MusicGroup);
                     aGraph.add(artist(aValue), URIImpl.RDFS_LABEL, aGraph.getValueFactory().createLiteral(aValue,
                                                                                                           aGraph.getValueFactory().createURI(XmlSchema.STRING)));
@@ -200,7 +204,7 @@ public class ITunesConverter implements Converter {
                     String aAlbum = get(aTrack, Key.Album);
 
                     for (String aName : composers(aValue)) {
-                        URI aURI = makeURI(aName);
+                        URI aURI = makeURI("artist", aName);
                         aGraph.add(aSubj, FOAF.maker, aURI);
                         aGraph.add(album(aAlbum), FOAF.maker, aURI);
 
@@ -212,8 +216,8 @@ public class ITunesConverter implements Converter {
                 else {
                     String aArtist = get(aTrack, Key.Artist);
                     String aAlbum = get(aTrack, Key.Album);
-                    aGraph.add(aSubj, FOAF.maker, makeURI(aArtist));
-                    aGraph.add(album(aAlbum), FOAF.maker, makeURI(aArtist));
+                    aGraph.add(aSubj, FOAF.maker, makeURI("artist", aArtist));
+                    aGraph.add(album(aAlbum), FOAF.maker, makeURI("artist", aArtist));
                 }
 
                 aValue = get(aTrack, Key.Location);
@@ -235,19 +239,19 @@ public class ITunesConverter implements Converter {
         }
     }
 
-    private URI makeURI(String theLabel) {
-        String aURI = "http://www.clarkparsia.com/jspace/itunes/" + clean(theLabel);
+    private URI makeURI(String theSlug, String theLabel) {
+        String aURI = "http://www.clarkparsia.com/jspace/itunes/" + theSlug + "/" + clean(theLabel);
         // this just validates that we have a valid URI
         java.net.URI.create(aURI);
         return new ValueFactoryImpl().createURI(aURI);
     }
 
     private URI album(String theURI) {
-        return makeURI(theURI);
+        return makeURI("album", theURI);
     }
 
     private URI artist(String theURI) {
-        return makeURI(theURI);
+        return makeURI("artist", theURI);
     }
 
     private String clean(String theStr) {
