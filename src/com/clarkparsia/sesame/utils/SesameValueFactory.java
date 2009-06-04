@@ -2,6 +2,7 @@ package com.clarkparsia.sesame.utils;
 
 import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.Literal;
+import org.openrdf.model.URI;
 import org.openrdf.vocabulary.XmlSchema;
 
 /**
@@ -13,6 +14,10 @@ import org.openrdf.vocabulary.XmlSchema;
  * @author Michael Grove <mike@clarkparsia.com>
  */
 public class SesameValueFactory extends ValueFactoryImpl {
+	public URI createURI(java.net.URI theURI) {
+		return super.createURI(theURI.toString());
+	}
+
 	public Literal createTypedLiteral(String theValue) {
 		return super.createLiteral(theValue, createURI(XmlSchema.STRING));
 	}

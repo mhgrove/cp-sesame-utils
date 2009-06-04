@@ -4,9 +4,13 @@ import org.openrdf.model.Resource;
 import org.openrdf.model.Graph;
 import org.openrdf.model.URI;
 import org.openrdf.model.Value;
+import org.openrdf.model.BNode;
 import org.openrdf.model.impl.URIImpl;
 import org.openrdf.model.impl.GraphImpl;
 import org.openrdf.vocabulary.XmlSchema;
+
+import java.util.List;
+import java.util.Iterator;
 
 /**
  * Title: <br/>
@@ -17,17 +21,42 @@ import org.openrdf.vocabulary.XmlSchema;
  * @author Michael Grove <mike@clarkparsia.com>
  */
 public class ResourceBuilder {
-    private Graph mGraph;
+    private ExtendedGraph mGraph;
     private Resource mRes;
 
     public ResourceBuilder(Resource theRes) {
-        this(new GraphImpl(), theRes);
+        this(new ExtendedGraph(), theRes);
     }
 
-    ResourceBuilder(Graph theGraph, Resource theRes) {
+    ResourceBuilder(ExtendedGraph theGraph, Resource theRes) {
         mRes = theRes;
         mGraph = theGraph;
     }
+
+	public ResourceBuilder addProperty(URI theProperty, java.net.URI theURI) {
+		return addProperty(theProperty, mGraph.getSesameValueFactory().createURI(theURI));
+	}
+
+	public ResourceBuilder addProperty(URI theProperty, List<? extends Resource> theList) {
+		Resource aListRes = mGraph.getSesameValueFactory().createBNode();
+
+		mGraph.add(getResource(), theProperty, aListRes);
+
+		Iterator<? extends Resource> aResIter = theList.iterator();
+		while (aResIter.hasNext()) {
+			mGraph.add(aListRes, URIImpl.RDF_FIRST, aResIter.next());
+			if (aResIter.hasNext()) {
+				BNode aNextListElem = mGraph.getSesameValueFactory().createBNode();
+				mGraph.add(aListRes, URIImpl.RDF_REST, aNextListElem);
+				aListRes = aNextListElem;
+			}
+			else {
+				mGraph.add(aListRes, URIImpl.RDF_REST, URIImpl.RDF_NIL);
+			}
+		}
+
+		return this;
+	}
 
     public ResourceBuilder addProperty(URI theProperty, Value theValue) {
         if (theValue != null) {
@@ -56,8 +85,7 @@ public class ResourceBuilder {
 
     public ResourceBuilder addProperty(URI theProperty, String theValue) {
 		if (theValue != null) {
-			return addProperty(theProperty, mGraph.getValueFactory().createLiteral(theValue,
-																				   mGraph.getValueFactory().createURI(XmlSchema.STRING)));
+			return addProperty(theProperty, mGraph.getSesameValueFactory().createLiteral(theValue));
 		}
 		else {
 			return this;
@@ -65,37 +93,31 @@ public class ResourceBuilder {
     }
 
     public ResourceBuilder addProperty(URI theProperty, int theValue) {
-        return addProperty(theProperty, mGraph.getValueFactory().createLiteral(String.valueOf(theValue),
-                                                                               mGraph.getValueFactory().createURI(XmlSchema.INT)));
+        return addProperty(theProperty, mGraph.getSesameValueFactory().createTypedLiteral(theValue));
     }
 
 
     public ResourceBuilder addProperty(URI theProperty, long theValue) {
-        return addProperty(theProperty, mGraph.getValueFactory().createLiteral(String.valueOf(theValue),
-                                                                               mGraph.getValueFactory().createURI(XmlSchema.LONG)));
+        return addProperty(theProperty, mGraph.getSesameValueFactory().createTypedLiteral(theValue));
     }
 
 
     public ResourceBuilder addProperty(URI theProperty, short theValue) {
-        return addProperty(theProperty, mGraph.getValueFactory().createLiteral(String.valueOf(theValue),
-                                                                               mGraph.getValueFactory().createURI(XmlSchema.SHORT)));
+        return addProperty(theProperty, mGraph.getSesameValueFactory().createTypedLiteral(theValue));
     }
 
 
     public ResourceBuilder addProperty(URI theProperty, double theValue) {
-        return addProperty(theProperty, mGraph.getValueFactory().createLiteral(String.valueOf(theValue),
-                                                                               mGraph.getValueFactory().createURI(XmlSchema.DOUBLE)));
+        return addProperty(theProperty, mGraph.getSesameValueFactory().createTypedLiteral(theValue));
     }
 
 
     public ResourceBuilder addProperty(URI theProperty, float theValue) {
-        return addProperty(theProperty, mGraph.getValueFactory().createLiteral(String.valueOf(theValue),
-                                                                               mGraph.getValueFactory().createURI(XmlSchema.FLOAT)));
+        return addProperty(theProperty, mGraph.getSesameValueFactory().createTypedLiteral(theValue));
     }
 
     public ResourceBuilder addProperty(URI theProperty, boolean theValue) {
-        return addProperty(theProperty, mGraph.getValueFactory().createLiteral(String.valueOf(theValue),
-                                                                               mGraph.getValueFactory().createURI(XmlSchema.BOOLEAN)));
+        return addProperty(theProperty, mGraph.getSesameValueFactory().createTypedLiteral(theValue));
     }
 
     public ResourceBuilder addLabel(String theLabel) {
