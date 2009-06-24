@@ -34,93 +34,170 @@ import com.clarkparsia.sesame.utils.query.SesameQueryUtils;
  */
 public class BaseSesameRepository implements SesameRepository {
 
+	/**
+	 * The base repository
+	 */
     private SesameRepository mRepo;
 
+	/**
+	 * Create a new BaseSesameRepository
+	 * @param theRepo the repo to decorate
+	 */
     public BaseSesameRepository(SesameRepository theRepo) {
         mRepo = theRepo;
     }
 
+	/**
+	 * Returns the base sesame repository
+	 * @return the base repository
+	 */
 	protected SesameRepository getBaseRepository() {
 		return mRepo;
 	}
 
+
+    ///////////////////////////////////////////////////////////////
+    /////
+    /////  SesameRepository Interface implementation
+    /////
+    ///////////////////////////////////////////////////////////////
+
+    /**
+     * @inheritDoc
+     */
     public void performTableQuery(QueryLanguage theQueryLanguage, String theQuery, TableQueryResultListener theTableQueryResultListener) throws IOException, MalformedQueryException, QueryEvaluationException, AccessDeniedException {
         mRepo.performTableQuery(theQueryLanguage, theQuery, theTableQueryResultListener);
     }
 
+    /**
+     * @inheritDoc
+     */
     public QueryResultsTable performTableQuery(QueryLanguage theQueryLanguage, String theQuery) throws IOException, MalformedQueryException, QueryEvaluationException, AccessDeniedException {
         return mRepo.performTableQuery(theQueryLanguage, theQuery);
     }
 
+    /**
+     * @inheritDoc
+     */
     public void performGraphQuery(QueryLanguage theQueryLanguage, String theQuery, GraphQueryResultListener theGraphQueryResultListener) throws IOException, MalformedQueryException, QueryEvaluationException, AccessDeniedException {
         mRepo.performGraphQuery(theQueryLanguage, theQuery, theGraphQueryResultListener);
     }
 
+    /**
+     * @inheritDoc
+     */
     public Graph performGraphQuery(QueryLanguage theQueryLanguage, String theQuery) throws IOException, MalformedQueryException, QueryEvaluationException, AccessDeniedException {
-        return mRepo.performGraphQuery(theQueryLanguage,  theQuery);
+        return mRepo.performGraphQuery(theQueryLanguage, theQuery);
     }
 
-    public void addData(URL theURL, String s, RDFFormat theRDFFormat, boolean theVerify, AdminListener theAdminListener) throws IOException, AccessDeniedException {
-        mRepo.addData(theURL, s, theRDFFormat, theVerify, theAdminListener);
+    /**
+     * @inheritDoc
+     */
+    public void addData(URL theURL, String theBase, RDFFormat theRDFFormat, boolean theVerify, AdminListener theAdminListener) throws IOException, AccessDeniedException {
+        mRepo.addData(theURL, theBase, theRDFFormat, theVerify, theAdminListener);
     }
 
-    public void addData(File theFile, String s, RDFFormat theRDFFormat, boolean theVerify, AdminListener theAdminListener) throws FileNotFoundException, IOException, AccessDeniedException {
-        mRepo.addData(theFile, s, theRDFFormat, theVerify, theAdminListener);
+    /**
+     * @inheritDoc
+     */
+    public void addData(File theFile, String theBase, RDFFormat theRDFFormat, boolean theVerify, AdminListener theAdminListener) throws FileNotFoundException, IOException, AccessDeniedException {
+        mRepo.addData(theFile, theBase, theRDFFormat, theVerify, theAdminListener);
     }
 
-    public void addData(String s, String s1, RDFFormat theRDFFormat, boolean theVerify, AdminListener theAdminListener) throws IOException, AccessDeniedException {
-        mRepo.addData(s, s1, theRDFFormat, theVerify, theAdminListener);
+    /**
+     * @inheritDoc
+     */
+    public void addData(String theData, String theBase, RDFFormat theRDFFormat, boolean theVerify, AdminListener theAdminListener) throws IOException, AccessDeniedException {
+        mRepo.addData(theData, theBase, theRDFFormat, theVerify, theAdminListener);
     }
 
+    /**
+     * @inheritDoc
+     */
     public void addData(SesameRepository theSesameRepository, AdminListener theAdminListener) throws IOException, AccessDeniedException {
         mRepo.addData(theSesameRepository, theAdminListener);
     }
 
-    public void addData(Reader theReader, String s, RDFFormat theRDFFormat, boolean theVerify, AdminListener theAdminListener) throws IOException, AccessDeniedException {
-        mRepo.addData(theReader, s, theRDFFormat, theVerify, theAdminListener);
+    /**
+     * @inheritDoc
+     */
+    public void addData(Reader theReader, String theBase, RDFFormat theRDFFormat, boolean theVerify, AdminListener theAdminListener) throws IOException, AccessDeniedException {
+        mRepo.addData(theReader, theBase, theRDFFormat, theVerify, theAdminListener);
     }
 
-    public void addData(InputStream theInputStream, String s, RDFFormat theRDFFormat, boolean theVerify, AdminListener theAdminListener) throws IOException, AccessDeniedException {
-        mRepo.addData(theInputStream, s, theRDFFormat, theVerify, theAdminListener);
+    /**
+     * @inheritDoc
+     */
+    public void addData(InputStream theInputStream, String theBase, RDFFormat theRDFFormat, boolean theVerify, AdminListener theAdminListener) throws IOException, AccessDeniedException {
+        mRepo.addData(theInputStream, theBase, theRDFFormat, theVerify, theAdminListener);
     }
 
+    /**
+     * @inheritDoc
+     */
     public void addGraph(Graph theGraph) throws IOException, AccessDeniedException {
         mRepo.addGraph(theGraph);
     }
 
-    public void addGraph(Graph theGraph, boolean b) throws IOException, AccessDeniedException {
-        mRepo.addGraph(theGraph, b);
+    /**
+     * @inheritDoc
+     */
+    public void addGraph(Graph theGraph, boolean theJoinBlank) throws IOException, AccessDeniedException {
+        mRepo.addGraph(theGraph, theJoinBlank);
     }
 
-    public void addGraph(QueryLanguage theQueryLanguage, String s) throws IOException, AccessDeniedException {
-        mRepo.addGraph(theQueryLanguage, s);
+    /**
+     * @inheritDoc
+     */
+    public void addGraph(QueryLanguage theQueryLanguage, String theQuery) throws IOException, AccessDeniedException {
+        mRepo.addGraph(theQueryLanguage, theQuery);
     }
 
-    public void addGraph(QueryLanguage theQueryLanguage, String s, boolean b) throws IOException, AccessDeniedException {
-        mRepo.addGraph(theQueryLanguage, s, b);
+    /**
+     * @inheritDoc
+     */
+    public void addGraph(QueryLanguage theQueryLanguage, String theQuery, boolean theJoinBlank) throws IOException, AccessDeniedException {
+        mRepo.addGraph(theQueryLanguage, theQuery, theJoinBlank);
     }
 
+    /**
+     * @inheritDoc
+     */
     public void removeGraph(Graph theGraph) throws IOException, AccessDeniedException {
         mRepo.removeGraph(theGraph);
     }
 
-    public void removeGraph(QueryLanguage theQueryLanguage, String s) throws IOException, AccessDeniedException {
-        mRepo.removeGraph(theQueryLanguage, s);
+    /**
+     * @inheritDoc
+     */
+    public void removeGraph(QueryLanguage theQueryLanguage, String theQuery) throws IOException, AccessDeniedException {
+        mRepo.removeGraph(theQueryLanguage, theQuery);
     }
 
-    public InputStream extractRDF(RDFFormat theRDFFormat, boolean b, boolean b1, boolean b2, boolean b3) throws IOException, AccessDeniedException {
-        return mRepo.extractRDF(theRDFFormat, b, b1, b2, b3);
+    /**
+     * @inheritDoc
+     */
+    public InputStream extractRDF(RDFFormat theRDFFormat, boolean theOntology, boolean theInstances, boolean theExplicitOnly, boolean thePrettyOut) throws IOException, AccessDeniedException {
+        return mRepo.extractRDF(theRDFFormat, theOntology, theInstances, theExplicitOnly, thePrettyOut);
     }
 
+    /**
+     * @inheritDoc
+     */
     public void removeStatements(Resource theResource, URI theURI, Value theValue, AdminListener theAdminListener) throws IOException, AccessDeniedException {
         mRepo.removeStatements(theResource, theURI, theValue, theAdminListener);
     }
 
+    /**
+     * @inheritDoc
+     */
     public void clear(AdminListener theAdminListener) throws IOException, AccessDeniedException {
         mRepo.clear(theAdminListener);
     }
 
+    /**
+     * @inheritDoc
+     */
     public String getRepositoryId() {
         return mRepo.getRepositoryId();
-    }
-}
+    }}

@@ -129,7 +129,7 @@ public class SesameIO {
         aRDFParser.setStatementHandler(aHandler);
 
 		try {
-			aRDFParser.parse(theReader, "");
+			aRDFParser.parse(theReader, "http://example.org/");
 		}
 		catch (StatementHandlerException e) {
 			throw new IOException(e.getMessage());
@@ -178,4 +178,8 @@ public class SesameIO {
         theWriter.endDocument();
         sIter.close();
     }
+
+	public static void main(String[] args) throws Exception {
+		readGraph(new java.io.FileInputStream("/Users/mhgrove/work/ClarkParsia/pellet-devel/trunk/test/data/swrl-test/builtIns/002-premise.n3"), RDFFormat.TURTLE);
+	}
 }

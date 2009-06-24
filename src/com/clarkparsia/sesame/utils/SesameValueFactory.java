@@ -27,7 +27,7 @@ public class SesameValueFactory extends ValueFactoryImpl {
 	}
 
 	public Literal createTypedLiteral(boolean theValue) {
-		return super.createLiteral(String.valueOf(theValue), createURI(XmlSchema.INT));
+		return super.createLiteral(String.valueOf(theValue), createURI(XmlSchema.BOOLEAN));
 	}
 
 	public Literal createTypedLiteral(char theValue) {
