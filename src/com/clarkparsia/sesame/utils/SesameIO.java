@@ -1,6 +1,7 @@
 package com.clarkparsia.sesame.utils;
 
 import org.openrdf.sesame.constants.RDFFormat;
+import org.openrdf.sesame.constants.QueryLanguage;
 import org.openrdf.sesame.repository.SesameRepository;
 import org.openrdf.sesame.admin.DummyAdminListener;
 import org.openrdf.sesame.admin.StdOutAdminListener;
@@ -8,6 +9,7 @@ import org.openrdf.sesame.admin.AdminMsgCollector;
 import org.openrdf.sesame.admin.AdminMsg;
 import org.openrdf.sesame.config.AccessDeniedException;
 import org.openrdf.sesame.sail.StatementIterator;
+import org.openrdf.sesame.Sesame;
 import org.openrdf.model.Graph;
 import org.openrdf.model.Statement;
 import org.openrdf.model.impl.GraphImpl;
@@ -30,6 +32,11 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.Writer;
+import java.io.StringReader;
+import java.io.File;
+
+import com.clarkparsia.sesame.utils.query.Binding;
+import com.clarkparsia.sesame.utils.query.IterableQueryResultsTable;
 
 /**
  * Title: SesameIO<br/>
@@ -180,6 +187,25 @@ public class SesameIO {
     }
 
 	public static void main(String[] args) throws Exception {
-		readGraph(new java.io.FileInputStream("/Users/mhgrove/work/ClarkParsia/pellet-devel/trunk/test/data/swrl-test/builtIns/002-premise.n3"), RDFFormat.TURTLE);
+		//readGraph(new java.io.FileInputStream("/Users/mhgrove/work/ClarkParsia/pellet-devel/trunk/test/data/swrl-test/builtIns/002-premise.n3"), RDFFormat.TURTLE);
+		String aQuery = "select distinct title, mission, theme, year\n" +
+						"from\n" +
+						"{s} rdf:type {<http://lurch.hq.nasa.gov/2005/11/21/pops/project>},\n" +
+						"{s} <http://lurch.hq.nasa.gov/2005/11/21/pops#projectTitle> {title},\n" +
+						"{s} <http://lurch.hq.nasa.gov/2005/11/21/pops#projectMission> {mission},\n" +
+						"{s} <http://lurch.hq.nasa.gov/2005/11/21/pops#projectTheme> {theme},\n" +
+						"{s} <http://lurch.hq.nasa.gov/2005/11/21/pops#projectYear> {year}";
+
+		StringBuffer aBuffer = new StringBuffer("title,mission,theme,year\n");
+
+		SesameRepository aRepo = Sesame.getService(new URL("http://localhost:8080/sesame/")).getRepository("pops-mem-rdf-db");
+		for (Binding aBinding : IterableQueryResultsTable.iterable(aRepo.performTableQuery(QueryLanguage.SERQL, aQuery))) {
+			aBuffer.append("\"").append(aBinding.getLiteral("title").getLabel()).append("\"").append(",").
+					append("\"").append(aBinding.getLiteral("mission").getLabel()).append("\"").append(",").
+					append("\"").append(aBinding.getLiteral("theme").getLabel()).append("\"").append(",").
+					append("\"").append(aBinding.getLiteral("year").getLabel()).append("\"").append("\n");
+		}
+
+		IOUtil.writeToFile(new StringReader(aBuffer.toString()), new File("/Users/mhgrove/Desktop/project.data.csv"));
 	}
 }

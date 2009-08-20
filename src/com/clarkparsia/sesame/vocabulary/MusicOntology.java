@@ -54,6 +54,7 @@ public class MusicOntology {
     public static final URI Blues = FACTORY.createURI(Genre.getURI() + "/Blues");
     public static final URI Jazz = FACTORY.createURI(Genre.getURI() + "/Jazz");
     public static final URI Vocal = FACTORY.createURI(Genre.getURI() + "/Vocal");
+	public static final URI Country = FACTORY.createURI(Genre.getURI() + "/Country");
 
     public static final URI album = FACTORY.createURI(ONT_URI + "album");
     public static final URI official = FACTORY.createURI(ONT_URI + "official");

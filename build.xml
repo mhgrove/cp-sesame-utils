@@ -10,7 +10,7 @@
     <property name="dist" location="dist" />
 
     <property name="project.name" value="cp-common-sesame" />
-    <property name="project.version" value="0.1" />
+    <property name="project.version" value="0.4" />
     <property name="mainclass" value="com.clarkparsia.sesame.SesameClient"/>
 
     <path id="project.class.path">
@@ -90,7 +90,7 @@
 
         <echo>${Class-Path}</echo>
         <!-- Make Jar file. -->
-        <jar jarfile="${dist}/lib/${project.name}.jar"
+        <jar jarfile="${dist}/lib/${project.name}-${project.version}.jar"
              basedir="${build}">
             <manifest>
                 <attribute name="Main-Class" value="${mainclass}"/>

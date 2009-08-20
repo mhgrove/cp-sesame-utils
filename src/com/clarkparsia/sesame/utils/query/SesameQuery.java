@@ -35,6 +35,10 @@ public class SesameQuery {
 		mQuery = theQuery;
 	}
 
+	public static SesameQuery serql(String theQuery) {
+		return new SesameQuery(QueryLanguage.SERQL, theQuery);
+	}
+
 	/**
 	 * @inheritDoc
 	 */

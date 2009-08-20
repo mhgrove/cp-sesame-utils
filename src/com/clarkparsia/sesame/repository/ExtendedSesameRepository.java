@@ -19,6 +19,7 @@ import org.openrdf.rio.ParseException;
 
 import com.clarkparsia.sesame.utils.SesameUtils;
 import com.clarkparsia.sesame.utils.SesameIO;
+import com.clarkparsia.sesame.utils.ExtendedGraph;
 import com.clarkparsia.sesame.utils.query.IterableQueryResultsTable;
 import com.clarkparsia.sesame.utils.query.SesameQuery;
 import com.clarkparsia.utils.CollectionUtil;
@@ -73,6 +74,12 @@ public class ExtendedSesameRepository extends BaseSesameRepository implements Se
 		return performSelectQuery(theQuery.getLanguage(), theQuery.getQueryString());
 	}
 
+	public ExtendedGraph performConstructQuery(SesameQuery theQuery) throws AccessDeniedException, IOException,
+																			MalformedQueryException,
+																			QueryEvaluationException {
+		return new ExtendedGraph(performGraphQuery(theQuery.getLanguage(), theQuery.getQueryString()));
+	}
+
 	public Iterable<Statement> getStatements() {
 		return getStatements(null, null, null);
 	}
@@ -81,10 +88,10 @@ public class ExtendedSesameRepository extends BaseSesameRepository implements Se
 		return SesameUtils.getStatements(this, theSubj, thePred, theObj);
 	}
 
-	public Graph describe(URI theURI) {
+	public ExtendedGraph describe(URI theURI) {
 		// TODO: need a null check for theURI
 		// TODO: make this align closer to a SPARQL describe
-		return SesameUtils.getStatements(this, theURI, null, null).asGraph();
+		return new ExtendedGraph(SesameUtils.getStatements(this, theURI, null, null).asGraph());
 	}
 
 	public void write(OutputStream theStream, RDFFormat theFormat) throws IOException {

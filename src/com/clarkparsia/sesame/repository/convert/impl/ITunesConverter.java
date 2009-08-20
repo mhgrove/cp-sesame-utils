@@ -311,6 +311,9 @@ public class ITunesConverter implements Converter {
             else if (aName.equalsIgnoreCase("Vocal")) {
                 aList.add(MusicOntology.Vocal);
             }
+			else if (aName.equalsIgnoreCase("Country")) {
+				aList.add(MusicOntology.Country);
+			}
             else {
                 throw new RuntimeException("unknown genre: " + aName);
             }

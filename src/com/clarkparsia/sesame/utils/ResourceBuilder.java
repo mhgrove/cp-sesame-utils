@@ -6,8 +6,6 @@ import org.openrdf.model.URI;
 import org.openrdf.model.Value;
 import org.openrdf.model.BNode;
 import org.openrdf.model.impl.URIImpl;
-import org.openrdf.model.impl.GraphImpl;
-import org.openrdf.vocabulary.XmlSchema;
 
 import java.util.List;
 import java.util.Iterator;
@@ -92,32 +90,62 @@ public class ResourceBuilder {
 		}
     }
 
-    public ResourceBuilder addProperty(URI theProperty, int theValue) {
-        return addProperty(theProperty, mGraph.getSesameValueFactory().createTypedLiteral(theValue));
+    public ResourceBuilder addProperty(URI theProperty, Integer theValue) {
+		if (theValue != null) {
+        	return addProperty(theProperty, mGraph.getSesameValueFactory().createTypedLiteral(theValue));
+		}
+		else {
+			return this;
+		}
     }
 
 
-    public ResourceBuilder addProperty(URI theProperty, long theValue) {
-        return addProperty(theProperty, mGraph.getSesameValueFactory().createTypedLiteral(theValue));
+    public ResourceBuilder addProperty(URI theProperty, Long theValue) {
+		if (theValue != null) {
+	        return addProperty(theProperty, mGraph.getSesameValueFactory().createTypedLiteral(theValue));
+		}
+		else {
+			return this;
+		}
     }
 
 
-    public ResourceBuilder addProperty(URI theProperty, short theValue) {
-        return addProperty(theProperty, mGraph.getSesameValueFactory().createTypedLiteral(theValue));
+    public ResourceBuilder addProperty(URI theProperty, Short theValue) {
+		if (theValue != null) {
+	        return addProperty(theProperty, mGraph.getSesameValueFactory().createTypedLiteral(theValue));
+		}
+		else {
+			return this;
+		}
     }
 
 
-    public ResourceBuilder addProperty(URI theProperty, double theValue) {
-        return addProperty(theProperty, mGraph.getSesameValueFactory().createTypedLiteral(theValue));
+    public ResourceBuilder addProperty(URI theProperty, Double theValue) {
+		if (theValue != null) {
+        	return addProperty(theProperty, mGraph.getSesameValueFactory().createTypedLiteral(theValue));
+		}
+		else {
+			return this;
+		}
     }
 
 
-    public ResourceBuilder addProperty(URI theProperty, float theValue) {
-        return addProperty(theProperty, mGraph.getSesameValueFactory().createTypedLiteral(theValue));
+    public ResourceBuilder addProperty(URI theProperty, Float theValue) {
+		if (theValue != null) {
+	        return addProperty(theProperty, mGraph.getSesameValueFactory().createTypedLiteral(theValue));
+		}
+		else {
+			return this;
+		}
     }
 
-    public ResourceBuilder addProperty(URI theProperty, boolean theValue) {
-        return addProperty(theProperty, mGraph.getSesameValueFactory().createTypedLiteral(theValue));
+    public ResourceBuilder addProperty(URI theProperty, Boolean theValue) {
+		if (theValue != null) {
+        	return addProperty(theProperty, mGraph.getSesameValueFactory().createTypedLiteral(theValue));
+		}
+		else {
+			return this;
+		}
     }
 
     public ResourceBuilder addLabel(String theLabel) {
