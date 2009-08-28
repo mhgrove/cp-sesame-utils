@@ -4,6 +4,9 @@ import org.openrdf.model.impl.ValueFactoryImpl;
 import org.openrdf.model.Literal;
 import org.openrdf.model.URI;
 import org.openrdf.vocabulary.XmlSchema;
+import com.clarkparsia.utils.BasicUtils;
+
+import java.util.Date;
 
 /**
  * Title: <br/>
@@ -20,6 +23,10 @@ public class SesameValueFactory extends ValueFactoryImpl {
 
 	public Literal createTypedLiteral(String theValue) {
 		return super.createLiteral(theValue, createURI(XmlSchema.STRING));
+	}
+
+	public Literal createTypedLiteral(Date theDate) {
+		return super.createLiteral(BasicUtils.datetime(theDate), createURI(XmlSchema.DATETIME));
 	}
 
 	public Literal createTypedLiteral(int theValue) {

@@ -9,6 +9,7 @@ import org.openrdf.model.impl.URIImpl;
 
 import java.util.List;
 import java.util.Iterator;
+import java.util.Date;
 
 /**
  * Title: <br/>
@@ -129,6 +130,14 @@ public class ResourceBuilder {
 		}
     }
 
+	public ResourceBuilder addProperty(URI theProperty, Date theValue) {
+		if (theValue != null) {
+			return addProperty(theProperty, mGraph.getSesameValueFactory().createTypedLiteral(theValue));
+		}
+		else {
+			return this;
+		}
+	}
 
     public ResourceBuilder addProperty(URI theProperty, Float theValue) {
 		if (theValue != null) {
