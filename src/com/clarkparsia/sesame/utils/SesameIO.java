@@ -1,3 +1,5 @@
+// Copyright (c) 2005 - 2009, Clark & Parsia, LLC. <http://www.clarkparsia.com>
+
 package com.clarkparsia.sesame.utils;
 
 import org.openrdf.sesame.constants.RDFFormat;
@@ -37,6 +39,7 @@ import java.io.File;
 
 import com.clarkparsia.sesame.utils.query.Binding;
 import com.clarkparsia.sesame.utils.query.IterableQueryResultsTable;
+import com.clarkparsia.sesame.utils.query.SesameQueryUtils;
 
 /**
  * Title: SesameIO<br/>
@@ -187,25 +190,41 @@ public class SesameIO {
     }
 
 	public static void main(String[] args) throws Exception {
+		String aQuery = "select  distinct uri, aLabel\n" +
+				"from\n" +
+				"{phantom0} <http://www.clarkparsia.com/baseball/position> {var0},\n" +
+				"{var0} <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> {<http://www.clarkparsia.com/baseball/position/Position>},\n" +
+				"{phantom0} <http://www.clarkparsia.com/baseball/player> {uri},\n" +
+				"{var1} <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> {<http://www.clarkparsia.com/baseball/team/Team>},\n" +
+				"{phantom0} <http://www.clarkparsia.com/baseball/team> {var1},\n" +
+				"{uri} <http://www.clarkparsia.com/baseball/careerBatting> {phantom1},\n" +
+				"{phantom1} <http://www.clarkparsia.com/baseball/homeruns> {var2},\n" +
+				"{uri} <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> {<http://www.clarkparsia.com/baseball/Player>},\n" +
+				"[{uri} <http://www.w3.org/2000/01/rdf-schema#label> {aLabel}]\n" +
+				"where\n" +
+				"((var0 = <http://www.clarkparsia.com/baseball/position/LeftField>) and ((var1 = <http://www.clarkparsia.com/baseball/BAL>) and (var2 >= \"105\"^^<http://www.w3.org/2001/XMLSchema#integer>)))\n" +
+				" limit 10000";
+		
+		System.err.println(SesameQueryUtils.getQueryRenderer("sparql").render(SesameQueryUtils.selectQuery(aQuery)));
 		//readGraph(new java.io.FileInputStream("/Users/mhgrove/work/ClarkParsia/pellet-devel/trunk/test/data/swrl-test/builtIns/002-premise.n3"), RDFFormat.TURTLE);
-		String aQuery = "select distinct title, mission, theme, year\n" +
-						"from\n" +
-						"{s} rdf:type {<http://lurch.hq.nasa.gov/2005/11/21/pops/project>},\n" +
-						"{s} <http://lurch.hq.nasa.gov/2005/11/21/pops#projectTitle> {title},\n" +
-						"{s} <http://lurch.hq.nasa.gov/2005/11/21/pops#projectMission> {mission},\n" +
-						"{s} <http://lurch.hq.nasa.gov/2005/11/21/pops#projectTheme> {theme},\n" +
-						"{s} <http://lurch.hq.nasa.gov/2005/11/21/pops#projectYear> {year}";
-
-		StringBuffer aBuffer = new StringBuffer("title,mission,theme,year\n");
-
-		SesameRepository aRepo = Sesame.getService(new URL("http://localhost:8080/sesame/")).getRepository("pops-mem-rdf-db");
-		for (Binding aBinding : IterableQueryResultsTable.iterable(aRepo.performTableQuery(QueryLanguage.SERQL, aQuery))) {
-			aBuffer.append("\"").append(aBinding.getLiteral("title").getLabel()).append("\"").append(",").
-					append("\"").append(aBinding.getLiteral("mission").getLabel()).append("\"").append(",").
-					append("\"").append(aBinding.getLiteral("theme").getLabel()).append("\"").append(",").
-					append("\"").append(aBinding.getLiteral("year").getLabel()).append("\"").append("\n");
-		}
-
-		IOUtil.writeToFile(new StringReader(aBuffer.toString()), new File("/Users/mhgrove/Desktop/project.data.csv"));
+//		String aQuery = "select distinct title, mission, theme, year\n" +
+//						"from\n" +
+//						"{s} rdf:type {<http://lurch.hq.nasa.gov/2005/11/21/pops/project>},\n" +
+//						"{s} <http://lurch.hq.nasa.gov/2005/11/21/pops#projectTitle> {title},\n" +
+//						"{s} <http://lurch.hq.nasa.gov/2005/11/21/pops#projectMission> {mission},\n" +
+//						"{s} <http://lurch.hq.nasa.gov/2005/11/21/pops#projectTheme> {theme},\n" +
+//						"{s} <http://lurch.hq.nasa.gov/2005/11/21/pops#projectYear> {year}";
+//
+//		StringBuffer aBuffer = new StringBuffer("title,mission,theme,year\n");
+//
+//		SesameRepository aRepo = Sesame.getService(new URL("http://localhost:8080/sesame/")).getRepository("pops-mem-rdf-db");
+//		for (Binding aBinding : IterableQueryResultsTable.iterable(aRepo.performTableQuery(QueryLanguage.SERQL, aQuery))) {
+//			aBuffer.append("\"").append(aBinding.getLiteral("title").getLabel()).append("\"").append(",").
+//					append("\"").append(aBinding.getLiteral("mission").getLabel()).append("\"").append(",").
+//					append("\"").append(aBinding.getLiteral("theme").getLabel()).append("\"").append(",").
+//					append("\"").append(aBinding.getLiteral("year").getLabel()).append("\"").append("\n");
+//		}
+//
+//		IOUtil.writeToFile(new StringReader(aBuffer.toString()), new File("/Users/mhgrove/Desktop/project.data.csv"));
 	}
 }
