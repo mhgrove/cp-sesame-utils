@@ -1,3 +1,5 @@
+// Copyright (c) 2005 - 2009, Clark & Parsia, LLC. <http://www.clarkparsia.com>
+
 package com.clarkparsia.sesame.utils.query;
 
 import org.openrdf.sesame.query.TableQuery;
@@ -20,8 +22,8 @@ import org.openrdf.model.URI;
 import org.openrdf.model.BNode;
 
 /**
- * Title: <br>
- * Description: <br>
+ * Title: SesameQueryUtils<br>
+ * Description: Collection of utility methods for dealing with the Sesame Query API<br>
  * Company: Clark & Parsia, LLC. <http://www.clarkparsia.com> <br>
  * Created: Aug 16, 2007 11:45:42 AM
  *
@@ -30,12 +32,44 @@ import org.openrdf.model.BNode;
 public class SesameQueryUtils {
     public static final String SPARQL = "sparql";
 
-    public static SelectQuery selectQuery(String theQuery) throws MalformedQueryException {
-        return (SelectQuery) new SerqlEngine(new RdfRepository()).parseTableQuery(theQuery).getQuery();
+	/**
+	 * Return a TableQuery object for the given table query string
+	 * @param theQuery the query string
+	 * @return a table query object
+	 * @throws MalformedQueryException thrown if the query cannot be parsed
+	 */
+    public static TableQuery tableQuery(String theQuery) throws MalformedQueryException {
+        return new SerqlEngine(new RdfRepository()).parseTableQuery(theQuery);
     }
 
+	/**
+	 * Return a GraphQuery object for the given graph query string
+	 * @param theQuery the query string
+	 * @return a graph query object
+	 * @throws MalformedQueryException thrown if the query cannot be parsed
+	 */
+    public static GraphQuery graphQuery(String theQuery) throws MalformedQueryException {
+        return new SerqlEngine(new RdfRepository()).parseGraphQuery(theQuery);
+    }
+
+	/**
+	 * Given a select query string, return a select query object
+	 * @param theQuery the query string
+	 * @return a select query object
+	 * @throws MalformedQueryException thrown if the query cannot be parsed
+	 */
+    public static SelectQuery selectQuery(String theQuery) throws MalformedQueryException {
+        return (SelectQuery) tableQuery(theQuery).getQuery();
+    }
+
+	/**
+	 * Given a construct query string, return the construct query object
+	 * @param theQuery the query string
+	 * @return a construct query object
+	 * @throws MalformedQueryException thrown if the query cannot be parsed
+	 */
     public static ConstructQuery constructQuery(String theQuery) throws MalformedQueryException {
-        return (ConstructQuery) new SerqlEngine(new RdfRepository()).parseGraphQuery(theQuery).getQuery();
+        return (ConstructQuery) graphQuery(theQuery).getQuery();
     }
 
     /**

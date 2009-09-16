@@ -1,9 +1,12 @@
+// Copyright (c) 2005 - 2009, Clark & Parsia, LLC. <http://www.clarkparsia.com>
+
 package com.clarkparsia.sesame.vocabulary;
 
 import org.openrdf.model.ValueFactory;
 import org.openrdf.model.URI;
 import org.openrdf.model.Graph;
 import org.openrdf.model.impl.ValueFactoryImpl;
+import com.clarkparsia.sesame.utils.SesameValueFactory;
 
 /**
  * Title: <br/>
@@ -14,7 +17,7 @@ import org.openrdf.model.impl.ValueFactoryImpl;
  * @author Michael Grove <mike@clarkparsia.com>
  */
 public abstract class Vocabulary {
-    private static final ValueFactory FACTORY = new ValueFactoryImpl();
+    protected static final SesameValueFactory FACTORY = new SesameValueFactory();
 
     private String mURI;
 
