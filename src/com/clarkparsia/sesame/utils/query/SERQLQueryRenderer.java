@@ -137,7 +137,12 @@ public class SERQLQueryRenderer implements QueryRenderer {
         ProjectionElem[] aSelectVars = theQuery.getProjection();
         for (int i = 0; i < aSelectVars.length; i++) {
 
-            aQuery.append(aSelectVars[i].getName());
+			if (aSelectVars[i].getAlias() != null) {
+				aQuery.append(renderValueExpr(aSelectVars[i].getValueExpr())).append(" as \"").append(aSelectVars[i].getAlias()).append("\"");
+			}
+			else {
+            	aQuery.append(aSelectVars[i].getName());
+			}
 
             if (i < aSelectVars.length - 1)
                 aQuery.append(", ");

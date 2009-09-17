@@ -217,4 +217,19 @@ public class SesameQueryUtils {
         }
         return -1;
     }
+
+	public static void main(String[] args) throws Exception {
+		String aQuery = "select a, NULL as \"b\", \"37\"^^<http://example.org> as \"c\" from {a} rdf:type {<http://www.example.org>}";
+		TableQuery tq = tableQuery(aQuery);
+		SelectQuery q = (SelectQuery) tq.getQuery();
+		for (int i = 0; i < q.getProjection().length; i++) {
+			System.err.println(q.getProjection()[i].getName());
+			System.err.println(q.getProjection()[i].getAlias());
+			System.err.println(q.getProjection()[i].getValueExpr());
+			System.err.println("---");
+		}
+
+		System.err.println(aQuery);
+		System.err.println(getQueryRenderer("serql").render(q));
+	}
 }
