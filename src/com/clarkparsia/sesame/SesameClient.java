@@ -40,7 +40,7 @@ import com.clarkparsia.sesame.utils.QueryResultCounter;
 import com.clarkparsia.sesame.utils.SesameUtils;
 
 import com.clarkparsia.utils.BasicUtils;
-import com.clarkparsia.utils.HTTPS;
+import com.clarkparsia.utils.net.HTTPS;
 import com.clarkparsia.utils.TableFormatter;
 
 /**

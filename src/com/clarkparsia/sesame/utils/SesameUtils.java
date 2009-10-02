@@ -57,7 +57,7 @@ import com.clarkparsia.sesame.utils.query.Binding;
 import com.clarkparsia.sesame.utils.query.IterableQueryResultsTable;
 import com.clarkparsia.sesame.repository.ExtendedSesameRepository;
 import com.clarkparsia.utils.BasicUtils;
-import com.clarkparsia.utils.CollectionUtil;
+import com.clarkparsia.utils.collections.CollectionUtil;
 
 /**
  * <p>Title: </p>

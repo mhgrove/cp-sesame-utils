@@ -35,6 +35,7 @@ import org.openrdf.model.URI;
 import org.openrdf.model.Graph;
 import org.openrdf.model.impl.ValueFactoryImpl;
 import com.clarkparsia.sesame.utils.SesameUtils;
+import com.clarkparsia.utils.net.VisualAuthenticator;
 
 /**
  * Title: <br>
@@ -326,7 +327,7 @@ System.err.println(aGraph.getStatements().hasNext());
 //            return;
 //        }
 
-        java.net.Authenticator.setDefault(new com.clarkparsia.utils.VisualAuthenticator());
+        java.net.Authenticator.setDefault(new VisualAuthenticator());
 
         new SesameConsole().setVisible(true);
     }
