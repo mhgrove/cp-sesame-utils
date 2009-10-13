@@ -42,7 +42,7 @@ import org.openrdf.sesame.sail.query.Intersect;
 import org.openrdf.sesame.sail.query.Minus;
 import org.openrdf.sesame.sail.query.Union;
 import org.openrdf.sesame.sail.query.Lang;
-import com.clarkparsia.utils.BasicUtils;
+
 import com.clarkparsia.utils.io.IOUtil;
 
 /**

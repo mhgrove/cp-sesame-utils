@@ -196,7 +196,7 @@ public class SesameQueryUtils {
             aStr = "_:"+((BNode)theValue).getID();
         else if (theValue instanceof Literal) {
             Literal aLit = (Literal)theValue;
-            aStr = "\"" + escape(aLit.getLabel()) + (aLit.getLanguage() != null ? "@"+aLit.getLanguage() : "") +"\"";
+            aStr = "\"" + escape(aLit.getLabel()) + "\"" + (aLit.getLanguage() != null ? "@"+aLit.getLanguage() : "") ;
             if (aLit.getDatatype() != null)
                 aStr += "^^<"+aLit.getDatatype().toString()+">";
         }

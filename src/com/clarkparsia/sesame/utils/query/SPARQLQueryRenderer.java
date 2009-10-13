@@ -1,3 +1,5 @@
+// Copyright (c) 2005 - 2009, Clark & Parsia, LLC. <http://www.clarkparsia.com>
+
 package com.clarkparsia.sesame.utils.query;
 
 import java.util.Iterator;
@@ -287,37 +289,25 @@ public class SPARQLQueryRenderer implements QueryRenderer {
             if (aCompare.getLeftArg() instanceof Null || aCompare.getRightArg() instanceof Null) {
                 ValueExpr aExpr = aCompare.getLeftArg() instanceof Null ? aCompare.getRightArg() : aCompare.getLeftArg();
 
-                if (aCompare.getOperator() == ValueCompare.NE) {
-                    aBuffer.append(SPARQL_NOT);
-                }
+				if (aExpr instanceof Lang) {
+					// lang(foo) = null is a special case.  lang(foo) that doesnt have a lang in serql is a null
+					// in sparql, its an empty string.
+					aBuffer.append(serializeValueExpr(aExpr)).append(op2String(aCompare)).append(" \"\"");
+				}
+				else {
+					if (aCompare.getOperator() == ValueCompare.EQ) {
+						aBuffer.append(SPARQL_NOT);
+					}
 
-                aBuffer.append(SPARQL_OP_BOUND).append("(").append(serializeValueExpr(aExpr)).append(")");
+                	aBuffer.append(SPARQL_OP_BOUND).append("(").append(serializeValueExpr(aExpr)).append(")");
+				}
             }
             else {
                 aBuffer.append(serializeValueExpr(aCompare.getLeftArg()));
 
-                switch (aCompare.getOperator()) {
-                    case ValueCompare.EQ:
-                        aBuffer.append(" " + SPARQL_EQ + "  ");
-                        break;
-                    case ValueCompare.GE:
-                        aBuffer.append(" " + SPARQL_GE + " ");
-                        break;
-                    case ValueCompare.GT:
-                        aBuffer.append(" " + SPARQL_GT + " ");
-                        break;
-                    case ValueCompare.LE:
-                        aBuffer.append(" " + SPARQL_LE + " ");
-                        break;
-                    case ValueCompare.LT:
-                        aBuffer.append(" " + SPARQL_LT + " ");
-                        break;
-                    case ValueCompare.NE:
-                        aBuffer.append(" " + SPARQL_NE + " ");
-                        break;
-                }
+				aBuffer.append(op2String(aCompare));
 
-                aBuffer.append(serializeValueExpr(aCompare.getRightArg()));
+				aBuffer.append(serializeValueExpr(aCompare.getRightArg()));
             }
         }
         else if (theConstraint instanceof IsBNode) {
@@ -382,7 +372,33 @@ public class SPARQLQueryRenderer implements QueryRenderer {
         return aBuffer.toString();
     }
 
-    private String serializeValueExpr(ValueExpr theValueExpr) {
+	private String op2String(final ValueCompare theCompare) {
+		final StringBuffer aBuffer = new StringBuffer();
+		switch (theCompare.getOperator()) {
+			case ValueCompare.EQ:
+				aBuffer.append(" " + SPARQL_EQ + "  ");
+				break;
+			case ValueCompare.GE:
+				aBuffer.append(" " + SPARQL_GE + " ");
+				break;
+			case ValueCompare.GT:
+				aBuffer.append(" " + SPARQL_GT + " ");
+				break;
+			case ValueCompare.LE:
+				aBuffer.append(" " + SPARQL_LE + " ");
+				break;
+			case ValueCompare.LT:
+				aBuffer.append(" " + SPARQL_LT + " ");
+				break;
+			case ValueCompare.NE:
+				aBuffer.append(" " + SPARQL_NE + " ");
+				break;
+		}
+
+		return aBuffer.toString();
+	}
+
+	private String serializeValueExpr(ValueExpr theValueExpr) {
         // TODO: cover all subclasses of value expression
 
         if (theValueExpr instanceof Var) {
@@ -429,7 +445,7 @@ public class SPARQLQueryRenderer implements QueryRenderer {
         }
         else if (theValue instanceof Literal) {
             Literal aLit = (Literal)theValue;
-            aBuffer.append("\"").append(escape(aLit.getLabel())).append(aLit.getLanguage() != null ? "@" + aLit.getLanguage() : "").append("\"");
+            aBuffer.append("\"").append(escape(aLit.getLabel())).append("\"").append(aLit.getLanguage() != null ? "@" + aLit.getLanguage() : "");
             if (aLit.getDatatype() != null) {
                 aBuffer.append("^^<").append(aLit.getDatatype().toString()).append(">");
             }
