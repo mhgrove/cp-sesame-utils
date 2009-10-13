@@ -1,3 +1,5 @@
+// Copyright (c) 2005 - 2009, Clark & Parsia, LLC. <http://www.clarkparsia.com>
+
 package com.clarkparsia.sesame.utils.query.optimize;
 
 import java.util.List;
@@ -5,6 +7,7 @@ import java.util.Iterator;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.ArrayList;
+import java.util.Collection;
 
 import org.openrdf.sesame.sail.query.GraphPattern;
 import org.openrdf.sesame.sail.query.BooleanExpr;
@@ -12,6 +15,8 @@ import org.openrdf.sesame.sail.query.And;
 import org.openrdf.sesame.sail.query.ValueCompare;
 import org.openrdf.sesame.sail.query.PathExpression;
 import org.openrdf.sesame.sail.query.TriplePattern;
+import org.openrdf.sesame.sail.query.Var;
+import org.openrdf.sesame.sail.query.ValueExpr;
 import org.openrdf.model.Value;
 
 /**
@@ -23,6 +28,7 @@ import org.openrdf.model.Value;
  * @author Michael Grove <mike@clarkparsia.com>
  */
 public class VariableInlinePatternOptimizer extends AbstractPatternOptimizer {
+	private Collection<?> mDoNotInline;
 
     public VariableInlinePatternOptimizer() {
         super();
@@ -32,10 +38,23 @@ public class VariableInlinePatternOptimizer extends AbstractPatternOptimizer {
         super(theOpt);
     }
 
+	public GraphPattern optimize(GraphPattern thePattern, Collection theNoInline) throws Exception {
+		// we pass in the project variables here so we don't optimize out the variables we're selecting
+		// that leads to disaster if there are vars in the projection which are not in any query atom
+
+		mDoNotInline = theNoInline;
+
+		GraphPattern aPattern = super.optimize(thePattern);
+
+		mDoNotInline.clear();
+
+		return aPattern;
+	}
+
     protected GraphPattern performOptimization(GraphPattern thePattern) throws Exception {
         Map aActuallyBoundVars = collectBoundVars(thePattern.getRootConstraint());
 
-        List aConstraintsToRemove = new ArrayList();
+        List<BooleanExpr> aConstraintsToRemove = new ArrayList<BooleanExpr>();
 
         List aConstraintList = new ArrayList(thePattern.getConjunctiveConstraints());
         Iterator aConstraintIter = aConstraintList.iterator();
@@ -128,7 +147,7 @@ public class VariableInlinePatternOptimizer extends AbstractPatternOptimizer {
     private GraphPattern substVars(GraphPattern thePattern, Map theBoundVars) {
         GraphPattern aPattern = thePattern;
 
-        List aNewExpressions = new ArrayList();
+        List<PathExpression> aNewExpressions = new ArrayList<PathExpression>();
 
         List aExpressions = aPattern.getPathExpressions();
         Iterator aExprIter = aExpressions.iterator();
@@ -141,15 +160,15 @@ public class VariableInlinePatternOptimizer extends AbstractPatternOptimizer {
             else if (aExpr instanceof TriplePattern) {
                 TriplePattern aTriple = (TriplePattern) aExpr;
 
-                if (theBoundVars.containsKey(aTriple.getSubjectVar())) {
+                if (theBoundVars.containsKey(aTriple.getSubjectVar()) && !mDoNotInline.contains(aTriple.getSubjectVar())) {
                     aTriple.getSubjectVar().setValue( (Value) theBoundVars.get(aTriple.getSubjectVar()));
                 }
 
-                if (theBoundVars.containsKey(aTriple.getPredicateVar())) {
+                if (theBoundVars.containsKey(aTriple.getPredicateVar()) && !mDoNotInline.contains(aTriple.getPredicateVar())) {
                     aTriple.getPredicateVar().setValue( (Value) theBoundVars.get(aTriple.getPredicateVar()));
                 }
 
-                if (theBoundVars.containsKey(aTriple.getObjectVar())) {
+                if (theBoundVars.containsKey(aTriple.getObjectVar()) && !mDoNotInline.contains(aTriple.getObjectVar())) {
                     aTriple.getObjectVar().setValue( (Value) theBoundVars.get(aTriple.getObjectVar()));
                 }
 
@@ -165,8 +184,8 @@ public class VariableInlinePatternOptimizer extends AbstractPatternOptimizer {
         return aPattern;
     }
 
-    private Map collectBoundVars(BooleanExpr theExpr) {
-        Map aVars = new HashMap();
+    private Map<ValueExpr, Value> collectBoundVars(BooleanExpr theExpr) {
+        Map<ValueExpr, Value> aVars = new HashMap<ValueExpr, Value>();
 
         if (theExpr instanceof ValueCompare) {
             ValueCompare aValCompare = (ValueCompare) theExpr;
@@ -184,8 +203,8 @@ public class VariableInlinePatternOptimizer extends AbstractPatternOptimizer {
         else if (theExpr instanceof And) {
             And aAnd = (And) theExpr;
 
-            Map aLeftVars = collectBoundVars(aAnd.getLeftArg());
-            Map aRightVars = collectBoundVars(aAnd.getRightArg());
+            Map<ValueExpr, Value> aLeftVars = collectBoundVars(aAnd.getLeftArg());
+            Map<ValueExpr, Value> aRightVars = collectBoundVars(aAnd.getRightArg());
 
             if (aLeftVars.size() > 0 && aRightVars.size() > 0) {
                 aVars.putAll(aLeftVars);

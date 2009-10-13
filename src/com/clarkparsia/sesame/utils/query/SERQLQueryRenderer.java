@@ -1,3 +1,5 @@
+// Copyright (c) 2005 - 2009, Clark & Parsia, LLC. <http://www.clarkparsia.com>
+
 package com.clarkparsia.sesame.utils.query;
 
 import java.util.Iterator;
@@ -39,6 +41,7 @@ import org.openrdf.sesame.sail.query.SetOperator;
 import org.openrdf.sesame.sail.query.Intersect;
 import org.openrdf.sesame.sail.query.Minus;
 import org.openrdf.sesame.sail.query.Union;
+import org.openrdf.sesame.sail.query.Lang;
 import com.clarkparsia.utils.BasicUtils;
 import com.clarkparsia.utils.io.IOUtil;
 
@@ -361,6 +364,10 @@ public class SERQLQueryRenderer implements QueryRenderer {
         else if (theValueExpr instanceof Var) {
             aBuffer.append(renderVar( (Var) theValueExpr));
         }
+		else if (theValueExpr instanceof Lang) {
+			Lang aLang = (Lang) theValueExpr;
+			aBuffer.append("lang(").append(renderVar(aLang.getVar())).append(")");
+		}
 
         return aBuffer.toString();
     }
