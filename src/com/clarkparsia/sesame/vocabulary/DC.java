@@ -12,14 +12,29 @@ import org.openrdf.model.impl.ValueFactoryImpl;
  *
  * @author Michael Grove <mike@clarkparsia.com>
  */
-public class DC {
-    public static final String ONT_URI = "http://purl.org/dc/elements/1.1/";
+public class DC extends Vocabulary {
+	private static final DC VOCAB = new DC();
 
-    private static final ValueFactory FACTORY = new ValueFactoryImpl();
+    private DC() {
+        super("http://purl.org/dc/elements/1.1/");
+    }
 
-    public static final URI title = FACTORY.createURI(ONT_URI + "title");
-    public static final URI date = FACTORY.createURI(ONT_URI + "date");
-    public static final URI creator = FACTORY.createURI(ONT_URI + "creator");
-    public static final URI subject = FACTORY.createURI(ONT_URI + "subject");
-    public static final URI rights = FACTORY.createURI(ONT_URI + "rights");
+    public static DC ontology() {
+        return VOCAB;
+    }
+
+    public final URI title = term("title");
+    public final URI creator = term("creator");
+    public final URI subject = term("subject");
+    public final URI description = term("description");
+    public final URI contributor = term("contributor");
+    public final URI date = term("date");
+    public final URI type = term("type");
+    public final URI format = term ("format");
+    public final URI identifier = term("identifier");
+    public final URI source = term("source");
+    public final URI language = term("language");
+    public final URI relation = term("relation");
+    public final URI coverage = term("coverage");
+    public final URI rights = term("rights");
 }

@@ -171,7 +171,7 @@ public class ITunesConverter implements Converter {
 
                 aValue = get(aTrack, Key.Name);
                 if (aValue != null) {
-                    aGraph.add(aSubj, DC.title,
+                    aGraph.add(aSubj, DC.ontology().title,
                                aGraph.getValueFactory().createLiteral(aValue,
                                                                       aGraph.getValueFactory().createURI(XmlSchema.STRING)));
                 }
@@ -185,7 +185,7 @@ public class ITunesConverter implements Converter {
                     aGraph.add(album(aValue), URIImpl.RDF_TYPE, MusicOntology.Record);
 					aGraph.add(album(aValue), URIImpl.RDFS_LABEL, aGraph.getValueFactory().createLiteral(aValue,
                                                                                                           aGraph.getValueFactory().createURI(XmlSchema.STRING)));
-					aGraph.add(album(aValue), DC.title, aGraph.getValueFactory().createLiteral(aValue,
+					aGraph.add(album(aValue), DC.ontology().title, aGraph.getValueFactory().createLiteral(aValue,
                                                                                                           aGraph.getValueFactory().createURI(XmlSchema.STRING)));
                 }
 
