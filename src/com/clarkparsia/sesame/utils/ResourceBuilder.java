@@ -84,7 +84,7 @@ public class ResourceBuilder {
 
     public ResourceBuilder addProperty(URI theProperty, String theValue) {
 		if (theValue != null) {
-			return addProperty(theProperty, mGraph.getSesameValueFactory().createLiteral(theValue));
+			return addProperty(theProperty, mGraph.getSesameValueFactory().createTypedLiteral(theValue));
 		}
 		else {
 			return this;

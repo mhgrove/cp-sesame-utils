@@ -17,6 +17,15 @@ import java.util.Date;
  * @author Michael Grove <mike@clarkparsia.com>
  */
 public class SesameValueFactory extends ValueFactoryImpl {
+	private static SesameValueFactory INSTANCE;
+	public static SesameValueFactory instance() {
+		if (INSTANCE == null) {
+			INSTANCE = new SesameValueFactory();
+		}
+
+		return INSTANCE;
+	}
+
 	public URI createURI(java.net.URI theURI) {
 		return super.createURI(theURI.toString());
 	}

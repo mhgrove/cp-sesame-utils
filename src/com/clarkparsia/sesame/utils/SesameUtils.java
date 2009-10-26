@@ -92,6 +92,18 @@ public class SesameUtils
         }
     }
 
+	public static Graph asGraph(StatementIterator theStatements) {
+		Graph aGraph = new GraphImpl();
+
+		while (theStatements.hasNext()) {
+			aGraph.add(theStatements.next());
+		}
+
+		theStatements.close();
+
+		return aGraph;
+	}
+
 	public static Graph asGraph(Statement... theStatements) {
 		Graph aGraph = new GraphImpl();
 
