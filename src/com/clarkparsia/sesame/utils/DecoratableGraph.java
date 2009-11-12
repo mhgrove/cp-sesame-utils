@@ -19,7 +19,7 @@ import java.util.Collection;
  * @author Michael Grove <mike@clarkparsia.com>
  */
 
-public class DecoratableGraph implements Graph {
+public abstract class DecoratableGraph implements Graph {
 	private Graph mGraph;
 
 	private SesameValueFactory mValueFactory = new SesameValueFactory();

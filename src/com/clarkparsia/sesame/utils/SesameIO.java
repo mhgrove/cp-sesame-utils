@@ -40,6 +40,7 @@ import java.io.File;
 import com.clarkparsia.sesame.utils.query.Binding;
 import com.clarkparsia.sesame.utils.query.IterableQueryResultsTable;
 import com.clarkparsia.sesame.utils.query.SesameQueryUtils;
+import com.clarkparsia.sesame.repository.ExtendedSesameRepository;
 
 /**
  * Title: SesameIO<br/>
@@ -61,7 +62,7 @@ public class SesameIO {
 		}
 	}
 
-	public static SesameRepository readRepository(InputStream theStream, RDFFormat theFormat) throws IOException, ParseException {
+	public static ExtendedSesameRepository readRepository(InputStream theStream, RDFFormat theFormat) throws IOException, ParseException {
 		InputStreamReader aReader = new InputStreamReader(theStream);
 
 		try {
@@ -72,7 +73,7 @@ public class SesameIO {
 		}
 	}
 
-	public static SesameRepository readRepository(Reader theReader, RDFFormat theFormat) throws IOException, ParseException {
+	public static ExtendedSesameRepository readRepository(Reader theReader, RDFFormat theFormat) throws IOException, ParseException {
 		SesameRepository aRepo = SesameUtils.createInMemSource();
 
 		try {
@@ -92,7 +93,7 @@ public class SesameIO {
 			throw new IOException(e.getMessage());
 		}
 
-		return aRepo;
+		return new ExtendedSesameRepository(aRepo);
 	}
 
 	public static Graph readGraph(URL theFile, RDFFormat theFormat) throws IOException, ParseException {

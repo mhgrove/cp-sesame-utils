@@ -232,21 +232,36 @@ System.err.println("ending add data");
     public static void main(String[] theArgs) throws Exception {
 
         if (true) {
+
+		String s = "select  distinct uri, aLabel\n" +
+				   "from\n" +
+				   "{goal_base} <http://lurch.hq.nasa.gov/2005/11/21/pops#holdsCompetency> {phantom0},\n" +
+				   "{phantom0} <http://lurch.hq.nasa.gov/2005/11/21/pops#usesCompetency> {var2},\n" +
+				   "{goal_base} <http://lurch.hq.nasa.gov/2005/11/21/pops#worksAt> {uri},\n" +
+				   "{goal_base} <http://lurch.hq.nasa.gov/2005/11/21/pops#worksOnProject> {var1},\n" +
+				   "{uri} <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> {<http://lurch.hq.nasa.gov/2005/11/21/pops#Center>},\n" +
+				   "{var1} <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> {<http://lurch.hq.nasa.gov/2005/11/21/pops/project>},\n" +
+				   "{var2} <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> {<http://lurch.hq.nasa.gov/2005/11/21/pops#Competency>},\n" +
+				   "{goal_base} <http://www.w3.org/1999/02/22-rdf-syntax-ns#type> {<http://xmlns.com/foaf/0.1/Person>},\n" +
+				   "[{uri} <http://www.w3.org/2000/01/rdf-schema#label> {aLabel}]\n" +
+				   " limit 10000";
+
         SesameService aService = Sesame.getService(new URL("https://cyrus.hq.nasa.gov/sesame"));
+			aService.login("pops", "nasadev");
 
         SesameRepository aRepo = aService.getRepository("pops-mem-rdf-db");
 
-        String aQuery = "select distinct uri, aLabel from {uri} rdf:type {<http://lurch.hq.nasa.gov/2005/11/21/pops/project>}, {uri} rdfs:label {aLabel} where aLabel like \"*new work*\" ignore case";
+//        String aQuery = "select distinct uri, aLabel from {uri} rdf:type {<http://lurch.hq.nasa.gov/2005/11/21/pops/project>}, {uri} rdfs:label {aLabel} where aLabel like \"*new work*\" ignore case";
 
-        QueryResultsTable aResults = aRepo.performTableQuery(QueryLanguage.SERQL, aQuery);
+        QueryResultsTable aResults = aRepo.performTableQuery(QueryLanguage.SERQL, s);
 
         System.err.println(aResults);
 
-        String aConstruct = "construct {uri} p {o}, {subj} pred {uri} from {uri} rdf:type {<http://lurch.hq.nasa.gov/2005/11/21/pops/project>}, {uri} rdfs:label {aLabel}, [{uri} p {o}], [{subj} pred {uri}] where aLabel like \"*new work*\" ignore case";
-
-        Graph aGraph = aRepo.performGraphQuery(QueryLanguage.SERQL, aConstruct);
-System.err.println(aGraph.getStatements().hasNext());
-        System.err.println(SesameUtils.graphAsTurtle(aGraph));
+//        String aConstruct = "construct {uri} p {o}, {subj} pred {uri} from {uri} rdf:type {<http://lurch.hq.nasa.gov/2005/11/21/pops/project>}, {uri} rdfs:label {aLabel}, [{uri} p {o}], [{subj} pred {uri}] where aLabel like \"*new work*\" ignore case";
+//
+//        Graph aGraph = aRepo.performGraphQuery(QueryLanguage.SERQL, aConstruct);
+//System.err.println(aGraph.getStatements().hasNext());
+//        System.err.println(SesameUtils.graphAsTurtle(aGraph));
         
         System.err.println("done?");
         System.err.println("---------");
@@ -329,6 +344,8 @@ System.err.println(aGraph.getStatements().hasNext());
 
         java.net.Authenticator.setDefault(new VisualAuthenticator());
 
-        new SesameConsole().setVisible(true);
+//        new SesameConsole().setVisible(true);
+
+
     }
 }

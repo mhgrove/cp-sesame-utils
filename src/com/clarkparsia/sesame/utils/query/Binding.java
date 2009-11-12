@@ -18,18 +18,32 @@ import java.util.HashMap;
  */
 public class Binding extends HashMap<String, Value> {
     public Literal getLiteral(String theString) {
-        return (Literal) get(theString);
+        return safeGet(theString, Literal.class);
     }
 
     public URI getURI(String theString) {
-        return (URI) get(theString);
+        return safeGet(theString, URI.class);
     }
 
     public BNode getBNode(String theString) {
-        return (BNode) get(theString);
+        return safeGet(theString, BNode.class);
     }
 
     public Resource getResource(String theString) {
-        return (Resource) get(theString);
+        return safeGet(theString, Resource.class);
     }
+
+	private <T> T safeGet(String theKey, Class<T> theClass) {
+		try {
+			if (containsKey(theKey)) {
+				return theClass.cast(get(theKey));
+			}
+			else {
+				return null;
+			}
+		}
+		catch (ClassCastException e) {
+			return null;
+		}
+	}
 }

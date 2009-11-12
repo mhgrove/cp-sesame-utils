@@ -6,6 +6,7 @@ import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Collection;
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -13,6 +14,7 @@ import java.io.InputStream;
 import java.io.StringWriter;
 import java.io.Reader;
 import java.io.InputStreamReader;
+import java.io.FileInputStream;
 
 import org.openrdf.model.impl.GraphImpl;
 import org.openrdf.model.impl.ValueFactoryImpl;
@@ -29,6 +31,7 @@ import org.openrdf.model.Literal;
 import org.openrdf.sesame.repository.SesameRepository;
 
 import org.openrdf.sesame.constants.QueryLanguage;
+import org.openrdf.sesame.constants.RDFFormat;
 
 import org.openrdf.sesame.query.QueryResultsTable;
 import org.openrdf.sesame.query.MalformedQueryException;
@@ -57,6 +60,8 @@ import com.clarkparsia.sesame.utils.query.Binding;
 import com.clarkparsia.sesame.utils.query.IterableQueryResultsTable;
 import com.clarkparsia.sesame.repository.ExtendedSesameRepository;
 import com.clarkparsia.utils.BasicUtils;
+import com.clarkparsia.utils.Function;
+import com.clarkparsia.utils.Predicate;
 import com.clarkparsia.utils.collections.CollectionUtil;
 
 /**
@@ -92,7 +97,7 @@ public class SesameUtils
         }
     }
 
-	public static Graph asGraph(StatementIterator theStatements) {
+	public static Graph asGraph(StmtIterator theStatements) {
 		Graph aGraph = new GraphImpl();
 
 		while (theStatements.hasNext()) {
@@ -105,13 +110,7 @@ public class SesameUtils
 	}
 
 	public static Graph asGraph(Statement... theStatements) {
-		Graph aGraph = new GraphImpl();
-
-		for (Statement aStmt : theStatements) {
-			aGraph.add(aStmt);
-		}
-
-		return aGraph;
+		return asGraph(new StmtIterator(theStatements));
 	}
 
     public static Set<Resource> getInstancesWithType(Graph theModel, Resource theType) {
@@ -119,22 +118,28 @@ public class SesameUtils
         Set<Resource> filter = new HashSet<Resource>();
 
         try {
-            SesameRepository aTempRepo = sesameRepository(theModel);
-            Set<Resource> types = getSubClassesOf(aTempRepo, theType, false);
+            final SesameRepository aTempRepo = sesameRepository(theModel);
+            final Set<Resource> types = getSubClassesOf(aTempRepo, theType, false);
 
             types.add(theType);
 
-            Iterator<Resource> iter = listIndividuals(theModel);
+            Iterator<Resource> aIter = listIndividuals(theModel);
 
-            while (iter.hasNext()) {
-                Resource inst = iter.next();
+			Collection<Resource> aFilteredList = CollectionUtil.filter(aIter, new Predicate<Resource>() {
+				public boolean accept(Resource theRes) {
+					try {
+						return !CollectionUtil.intersection(types, getTypes(aTempRepo, theRes)).isEmpty();
+					}
+					catch (Exception e) {
+						// TODO: better error handling than this
+						e.printStackTrace();
+						return false;
+					}
+				}
+			});
 
-                Set<Resource> aTypes = getTypes(aTempRepo, inst);
-				
-                if (CollectionUtil.containsAny(aTypes, types) && !filter.contains(inst)) {
-                    filter.add(inst);
-                }
-            }
+			// this will remove any dups
+            filter.addAll(aFilteredList);
         }
         catch (Throwable e) {
             e.printStackTrace();
@@ -171,6 +176,7 @@ public class SesameUtils
      * @param theURI the uri
      * @return the local name of the resource identified by the URI, or the entire URI if a local name cannot be found
      */
+	@Deprecated
 	public static String getLocalName(String theURI) {
 
 		int aIndex = theURI.lastIndexOf( "#" );
@@ -180,45 +186,20 @@ public class SesameUtils
 
 		return theURI.substring( aIndex + 1 );
 	}
-    
+
+	@Deprecated
     public static boolean isList(SesameRepository theRepo, Resource theRes) {
-        return theRes.equals(URIImpl.RDF_NIL) || getValue(theRepo, theRes, URIImpl.RDF_FIRST) != null;
+        return decorate(theRepo).isList(theRes);
     }
 
+	@Deprecated
     public static List<Value> asList(Graph theGraph, Resource theRes) {
-        ArrayList<Value> aList = new ArrayList<Value>();
-
-        Resource aListRes = theRes;
-
-        while (aListRes != null) {
-
-            Resource aFirst = (Resource) getValue(theGraph, aListRes, URIImpl.RDF_FIRST);
-            Resource aRest = (Resource) getValue(theGraph, aListRes, URIImpl.RDF_REST);
-
-            if (aFirst != null) {
-               aList.add(aFirst);
-            }
-
-            if (aRest == null || aRest.equals(URIImpl.RDF_NIL)) {
-               aListRes = null;
-            }
-            else {
-                aListRes = aRest;
-            }
-        }
-
-        return aList;
+		return decorateGraph(theGraph).asList(theRes);
     }
 
+	@Deprecated
     public static boolean isList(Graph theGraph, Resource theRes) {
-        StatementIterator sIter = theGraph.getStatements(theRes, URIImpl.RDF_FIRST, null);
-
-        try {
-            return theRes != null && theRes.equals(URIImpl.RDF_NIL) || sIter.hasNext();
-        }
-        finally {
-            sIter.close();
-        }
+		return decorateGraph(theGraph).isList(theRes);
     }
 
     /**
@@ -226,6 +207,7 @@ public class SesameUtils
      * @param theURI the uri
      * @return the namespace
      */
+	@Deprecated
 	public static String getNamespace(String theURI) {
 
 		int aIndex = theURI.lastIndexOf( "#" );
@@ -243,7 +225,8 @@ public class SesameUtils
 	 */
     public static SesameRepository sesameRepository(Graph theGraph) {
         try {
-            SesameRepository aRepo = Sesame.getService().createRepository("test-"+System.currentTimeMillis(), false);
+            SesameRepository aRepo = createInMemSource();
+			
             aRepo.addGraph(theGraph);
 
             return aRepo;
@@ -265,23 +248,32 @@ public class SesameUtils
 	 * @throws MalformedQueryException thrown if there is an error while querying
 	 * @throws QueryEvaluationException thrown if there is an error while querying
 	 */
-    public static Set<Resource> getTypes(SesameRepository theRepo, Resource theRes) throws IOException, AccessDeniedException, MalformedQueryException, QueryEvaluationException {
+	@Deprecated
+	/**
+	 * @see nothing -- i think we will do away with this faux-reasoning
+	 */
+    public static Set<Resource> getTypes(SesameRepository theRepo, Resource theRes) throws IOException, AccessDeniedException, QueryEvaluationException {
         Set<Resource> aTypes = new HashSet<Resource>();
 
         String aQuery = "select aType from {" + SesameQueryUtils.getQueryString(theRes) + "} rdf:type {aType}";
 
-        QueryResultsTable aTable = theRepo.performTableQuery(QueryLanguage.SERQL, aQuery);
+		try {
+			QueryResultsTable aTable = theRepo.performTableQuery(QueryLanguage.SERQL, aQuery);
 
-        for (Binding aBinding : IterableQueryResultsTable.iterable(aTable)) {
-            Resource aType = aBinding.getResource("aType");
+			for (Binding aBinding : IterableQueryResultsTable.iterable(aTable)) {
+				Resource aType = aBinding.getResource("aType");
 
-            aTypes.add(aType);
+				aTypes.add(aType);
 
-			// TODO: this is wrong, this should get all the superclasses of aType, not the other types of type.
-            aTypes.addAll(getTypes(theRepo, aType));
-        }
+				// TODO: this is wrong, this should get all the superclasses of aType, not the other types of type.
+				aTypes.addAll(getTypes(theRepo, aType));
+			}
+		}
+		catch (MalformedQueryException e) {
+			// we know this won't happy since we created the query above, we can safely ignore this
+		}
 
-        return aTypes;
+		return aTypes;
     }
 
     private static Set<Resource> mProcessedClassList = new HashSet<Resource>();
@@ -429,25 +421,15 @@ public class SesameUtils
         try {
             Graph aGraph = new GraphImpl();
 
-            for (int aRow = 0; aRow < theResults.getRowCount(); aRow++) {
-                Resource aSubj = null;
-                URI aPred = null;
-                Value aObj = null;
+			for (Binding aBinding : IterableQueryResultsTable.iterable(theResults)) {
+				Resource aSubj = aBinding.getResource("s");
+				URI aPred = aBinding.getURI("p");
+				Value aObj = aBinding.get("o");
 
-                for (int aCol = 0; aCol < theResults.getColumnCount(); aCol++) {
-                    if (theResults.getColumnName(aCol).equals("s"))
-                        aSubj = (Resource)theResults.getValue(aRow, aCol);
-                    else if (theResults.getColumnName(aCol).equals("p"))
-                        aPred = (URI)theResults.getValue(aRow, aCol);
-                    else if (theResults.getColumnName(aCol).equals("o")) {
-                        aObj = theResults.getValue(aRow, aCol);
-                    }
-                }
-
-                if (aSubj != null && aPred != null && aObj != null) {
-                    aGraph.add(aSubj, aPred, aObj);
-                }
-            }
+				if (aSubj != null && aPred != null && aObj != null) {
+					aGraph.add(aSubj, aPred, aObj);
+				}
+			}
 
             return aGraph;
         }
@@ -501,42 +483,9 @@ public class SesameUtils
         sIter.close();
     }
 
+	@Deprecated
     public static StmtIterator getStatements(SesameRepository theRepo, Resource theSubj, URI thePred, Value theObj) {
-        String aQuery = "construct * from {s} p {o} ";
-
-
-        try {
-            if (theSubj != null || thePred != null || theObj != null) {
-                aQuery += " where ";
-			}
-
-            boolean needsAnd = false;
-            if (theSubj != null) {
-                aQuery += " (s = "+ SesameQueryUtils.getQueryString(theSubj)+ ") ";
-                needsAnd = true;
-            }
-
-            if (thePred != null) {
-                if (needsAnd) {
-                    aQuery += " and ";
-				}
-                aQuery += " (p = "+ SesameQueryUtils.getQueryString(thePred)+") ";
-                needsAnd = true;
-            }
-
-            if (theObj != null) {
-                if (needsAnd) {
-                    aQuery += " and ";
-				}
-                aQuery += " (o = "+ SesameQueryUtils.getQueryString(theObj)+")";
-            }
-
-            return new StmtIterator(theRepo.performGraphQuery(QueryLanguage.SERQL, aQuery).getStatements());
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
-            return new StmtIterator();
-        }
+		return new StmtIterator(decorate(theRepo).getStatements(theSubj, thePred, theObj));
     }
 
     public static boolean isType(Graph theGraph, URI theRes, Resource theType) {
@@ -559,104 +508,42 @@ public class SesameUtils
         }
     }
 
+	@Deprecated
     public static boolean hasStatement(SesameRepository theRepo, Resource theSubj, URI thePred, Value theObj) {
-        try {
-//            String aQuery = "select * from {s} p {o} where (s = "+ SesameQueryUtils.getQueryString(theSubj)+ ") and (p = "+ SesameQueryUtils.getQueryString(thePred)+") and (o = "+ SesameQueryUtils.getQueryString(theObj)+")";
-//
-//            QueryResultsTable aTable = theRepo.performTableQuery(QueryLanguage.SERQL, aQuery);
-//
-//            return aTable.getRowCount() > 0;
-
-            String aQuery = "select distinct s from {s} p {o} ";
-
-            if (theSubj != null || thePred != null || theObj != null)
-                aQuery += " where ";
-
-            boolean needsAnd = false;
-            if (theSubj != null) {
-                aQuery += " (s = "+SesameQueryUtils.getQueryString(theSubj)+ ") ";
-                needsAnd = true;
-            }
-
-            if (thePred != null) {
-                if (needsAnd)
-                    aQuery += " and ";
-                aQuery += " (p = "+SesameQueryUtils.getQueryString(thePred)+") ";
-                needsAnd = true;
-            }
-
-            if (theObj != null) {
-                if (needsAnd)
-                    aQuery += " and ";
-                aQuery += " (o = "+SesameQueryUtils.getQueryString(theObj)+")";
-            }
-
-            aQuery += " limit 1";
-
-            return theRepo.performTableQuery(QueryLanguage.SERQL, aQuery).getRowCount() > 0;
-        }
-        catch (Exception ex) {
-            ex.printStackTrace();
-            return false;
-        }
+		return decorate(theRepo).hasStatement(theSubj, thePred, theObj);
     }
 
+	@Deprecated
+	/**
+	 * @see ExtendedSesameRepository#getValue
+	 */
     public static Value getValue(SesameRepository theRepo, Resource theSubj, URI thePred) {
-        Iterator<Value> aIter = getValues(theRepo, theSubj, thePred);
-        
-        if (aIter.hasNext()) {
-            return aIter.next();
-        }
-        else return null;
+		return decorate(theRepo).getValue(theSubj, thePred);
     }
 
+	@Deprecated
     public static Literal getLiteral(SesameRepository theRepository, Resource theSubj, URI thePred) {
         return (Literal) getValue(theRepository, theSubj, thePred);
     }
 
+	@Deprecated
     public static Literal getLiteral(Graph theGraph, Resource theSubj, URI thePred) {
         return (Literal) getValue(theGraph, theSubj, thePred);
     }
 
+	@Deprecated
     public static Value getValue(Graph theGraph, Resource theSubj, URI thePred) {
-        Iterator<Value> aIter = getValues(theGraph, theSubj, thePred);
-
-        if (aIter.hasNext()) {
-            return aIter.next();
-        }
-        else {
-            return null;
-        }
+		return decorateGraph(theGraph).getValue(theSubj, thePred);
     }
 
+	@Deprecated
     public static Iterator<Value> getValues(Graph theGraph, Resource theSubj, URI thePred) {
-        StatementIterator sIter = theGraph.getStatements(theSubj, thePred, null);
-        HashSet<Value> aSet = new HashSet<Value>();
-        while (sIter.hasNext()) {
-            aSet.add(sIter.next().getObject());
-        }
-        sIter.close();
-
-        return aSet.iterator();
+		return decorateGraph(theGraph).getValues(theSubj, thePred);
     }
 
+	@Deprecated
     public static Iterator<Value> getValues(SesameRepository theRepo, Resource theSubj, URI thePred) {
-        try {
-            String aQuery = "select value from {"+ SesameQueryUtils.getQueryString(theSubj)+"} <"+thePred+"> {value}";
-
-            QueryResultsTable aTable = theRepo.performTableQuery(QueryLanguage.SERQL, aQuery);
-
-            Set<Value> aSet = new LinkedHashSet<Value>();
-            for (int i = 0; i < aTable.getRowCount(); i++)
-                aSet.add(aTable.getValue(i,0));
-
-            return aSet.iterator();
-        }
-        catch (Exception ex) {
-            //System.err.println("Error getting value for "+theSubj+", "+thePred);
-        }
-
-        return new HashSet<Value>().iterator();
+		return decorate(theRepo).getValues(theSubj, thePred).iterator();
     }
 
     public static URI getType(SesameRepository theRepo, Resource theRes) {
@@ -683,16 +570,18 @@ public class SesameUtils
         return null;
     }
 
+	@Deprecated
     public static int numStatements(Graph theGraph) {
-        int aCount = 0;
-
-        StatementIterator sIter = theGraph.getStatements();
-        while (sIter.hasNext()) {
-            sIter.next();
-            aCount++;
-        }
-        sIter.close();
-
-        return aCount;
+		return decorateGraph(theGraph).numStatements();
     }
+
+	private static ExtendedGraph decorateGraph(Graph theGraph) {
+		return new ExtendedGraph(theGraph);
+	}
+
+	public static void main(String[] args) throws Exception {
+		String aFile = "/Users/mhgrove/Desktop/clean.pops.production.model.ng.ttl";
+
+		Graph theGraph = SesameIO.readGraph(new FileInputStream(aFile), RDFFormat.TURTLE);
+	}
 }

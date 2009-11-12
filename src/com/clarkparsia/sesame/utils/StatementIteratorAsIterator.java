@@ -16,8 +16,25 @@ import java.util.Iterator;
 public class StatementIteratorAsIterator implements Iterator<Statement> {
 	private StatementIterator mIter;
 
+	private boolean mAutoClose = false;
+
+	/**
+	 * Create a new StatementIteratorAsIterator
+	 * @param theIter the underlying iterator 
+	 */
 	public StatementIteratorAsIterator(StatementIterator theIter) {
 		mIter = theIter;
+	}
+
+	/**
+	 * Create a new StatementIteratorAsIterator
+	 * @param theIter the underlying iterator
+	 * @param theAutoClose Whether or not to automatically close the underlying StatementIterator when done iterating
+	 */
+	public StatementIteratorAsIterator(StatementIterator theIter, boolean theAutoClose) {
+		this(theIter);
+
+		mAutoClose = theAutoClose;
 	}
 
 	public boolean hasNext() {
@@ -25,7 +42,17 @@ public class StatementIteratorAsIterator implements Iterator<Statement> {
 	}
 
 	public Statement next() {
-		return mIter.next();
+		Statement aNext = mIter.next();
+
+		if (!hasNext() && mAutoClose) {
+			mIter.close();
+		}
+
+		return aNext;
+	}
+
+	public void close() {
+		mIter.close();
 	}
 
 	public void remove() {
