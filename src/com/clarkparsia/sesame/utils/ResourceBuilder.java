@@ -36,12 +36,12 @@ public class ResourceBuilder {
 		return addProperty(theProperty, mGraph.getSesameValueFactory().createURI(theURI));
 	}
 
-	public ResourceBuilder addProperty(URI theProperty, List<? extends Resource> theList) {
+	public ResourceBuilder addProperty(URI theProperty, List<? extends Value> theList) {
 		Resource aListRes = mGraph.getSesameValueFactory().createBNode();
 
 		mGraph.add(getResource(), theProperty, aListRes);
 
-		Iterator<? extends Resource> aResIter = theList.iterator();
+		Iterator<? extends Value> aResIter = theList.iterator();
 		while (aResIter.hasNext()) {
 			mGraph.add(aListRes, URIImpl.RDF_FIRST, aResIter.next());
 			if (aResIter.hasNext()) {
