@@ -42,7 +42,7 @@ import com.clarkparsia.utils.Function;
  *
  * @author Michael Grove <mike@clarkparsia.com>
  */
-public class ExtendedGraph extends DecoratableGraph implements Graph {
+public class ExtendedGraph extends DecoratableGraph implements Graph, Iterable<Statement> {
 
 	/**
 	 * Create a new (empty) ExtendedGraph
@@ -67,6 +67,13 @@ public class ExtendedGraph extends DecoratableGraph implements Graph {
 		this();
 
 		add(new StmtIterator(theStatements));
+	}
+
+	/**
+	 * @inheritDoc
+	 */
+	public Iterator<Statement> iterator() {
+		return new StatementIteratorAsIterator(getStatements());
 	}
 
 	/**

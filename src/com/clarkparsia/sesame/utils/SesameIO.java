@@ -51,7 +51,7 @@ import com.clarkparsia.sesame.repository.ExtendedSesameRepository;
  * @author Michael Grove <mike@clarkparsia.com>
  */
 public class SesameIO {
-	public static SesameRepository readRepository(URL theFile, RDFFormat theFormat) throws IOException, ParseException {
+	public static ExtendedSesameRepository readRepository(URL theFile, RDFFormat theFormat) throws IOException, ParseException {
 		InputStream aStream = theFile.openStream();
 
 		try {
@@ -96,7 +96,7 @@ public class SesameIO {
 		return new ExtendedSesameRepository(aRepo);
 	}
 
-	public static Graph readGraph(URL theFile, RDFFormat theFormat) throws IOException, ParseException {
+	public static ExtendedGraph readGraph(URL theFile, RDFFormat theFormat) throws IOException, ParseException {
 		InputStream aStream = theFile.openStream();
 
 		try {
@@ -107,7 +107,7 @@ public class SesameIO {
 		}
 	}
 
-	public static Graph readGraph(InputStream theStream, RDFFormat theFormat) throws IOException, ParseException {
+	public static ExtendedGraph readGraph(InputStream theStream, RDFFormat theFormat) throws IOException, ParseException {
 		InputStreamReader aReader = new InputStreamReader(theStream);
 
 		try {
@@ -118,7 +118,7 @@ public class SesameIO {
 		}
 	}
 
-	public static Graph readGraph(Reader theReader, RDFFormat theFormat) throws IOException, ParseException {
+	public static ExtendedGraph readGraph(Reader theReader, RDFFormat theFormat) throws IOException, ParseException {
         Graph aGraph = new GraphImpl();
 
         Parser aRDFParser;
@@ -146,7 +146,7 @@ public class SesameIO {
 			throw new IOException(e.getMessage());
 		}
 
-		return aGraph;
+		return new ExtendedGraph(aGraph);
 	}
 
 	public static void writeGraph(Graph theGraph, Writer theWriter, RDFFormat theFormat) throws IOException {

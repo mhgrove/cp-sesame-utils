@@ -157,6 +157,54 @@ public class ResourceBuilder {
 		}
     }
 
+	public ResourceBuilder addProperty(URI theProperty, Object theObject) {
+		if (theObject == null) {
+			return this;
+		}
+		else if (theObject instanceof Boolean) {
+			return addProperty(theProperty, (Boolean) theObject);
+		}
+		else if (theObject instanceof Long) {
+			return addProperty(theProperty, (Long) theObject);
+		}
+		else if (theObject instanceof Integer) {
+			return addProperty(theProperty, (Integer) theObject);
+		}
+		else if (theObject instanceof Short) {
+			return addProperty(theProperty, (Short) theObject);
+		}
+		else if (theObject instanceof Float) {
+			return addProperty(theProperty, (Float) theObject);
+		}
+		else if (theObject instanceof Date) {
+			return addProperty(theProperty, (Date) theObject);
+		}
+		else if (theObject instanceof Double) {
+			return addProperty(theProperty, (Double) theObject);
+		}
+		else if (theObject instanceof Value) {
+			return addProperty(theProperty, (Value) theObject);
+		}
+		else if (theObject instanceof List) {
+			try {
+				return addProperty(theProperty, (List<Value>) theObject);
+			}
+			catch (ClassCastException e) {
+				e.printStackTrace();
+				return this;
+			}
+		}
+		else if (theObject instanceof ResourceBuilder) {
+			return addProperty(theProperty, (ResourceBuilder) theObject);
+		}
+		else if (theObject instanceof java.net.URI) {
+			return addProperty(theProperty, (java.net.URI) theObject);
+		}
+		else {
+			return addProperty(theProperty, theObject.toString());
+		}
+	}
+
     public ResourceBuilder addLabel(String theLabel) {
         return addProperty(URIImpl.RDFS_LABEL, theLabel);
     }
