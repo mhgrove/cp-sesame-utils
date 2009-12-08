@@ -34,6 +34,8 @@ public class FOAF {
     public static final URI phone = FACTORY.createURI(getURI().toString() + "phone");
     public static final URI fax = FACTORY.createURI(getURI().toString() + "fax");
     public static final URI based_near = FACTORY.createURI(getURI().toString() + "based_near");
+	public static final URI thumbnail = FACTORY.createURI(getURI().toString() + "thumbnail");
+	public static final URI homepage = FACTORY.createURI(getURI().toString() + "homepage");
 
     @Deprecated
     public static final URI regionDepicts = FACTORY.createURI(getURI().toString() + "regionDepicts");
