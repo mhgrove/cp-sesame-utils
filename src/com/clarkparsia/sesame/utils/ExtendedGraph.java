@@ -140,6 +140,10 @@ public class ExtendedGraph extends DecoratableGraph implements Graph, Iterable<S
 		}
 	}
 
+	public URI getType(Resource theSubj) {
+		return (URI) getValue(theSubj, URIImpl.RDF_TYPE);
+	}
+
 	public Literal getLiteral(Resource theRes, URI theProp) {
 		return (Literal) getValue(theRes, theProp);
 	}
