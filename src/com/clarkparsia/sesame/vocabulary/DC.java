@@ -37,4 +37,5 @@ public class DC extends Vocabulary {
     public final URI relation = term("relation");
     public final URI coverage = term("coverage");
     public final URI rights = term("rights");
+	public final URI publisher = term("publisher");
 }
