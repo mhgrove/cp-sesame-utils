@@ -7,6 +7,7 @@ import org.openrdf.model.BNode;
 import org.openrdf.model.Resource;
 
 import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Title: <br/>
@@ -17,6 +18,16 @@ import java.util.HashMap;
  * @author Michael Grove <mike@clarkparsia.com>
  */
 public class Binding extends HashMap<String, Value> {
+
+	public Binding() {
+	}
+	
+	public Binding(Map<String, Value> theMap) {
+		super();
+
+		putAll(theMap);
+	}
+
     public Literal getLiteral(String theString) {
         return safeGet(theString, Literal.class);
     }
