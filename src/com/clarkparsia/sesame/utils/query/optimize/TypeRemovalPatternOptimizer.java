@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2005-2010 Clark & Parsia, LLC. <http://www.clarkparsia.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.clarkparsia.sesame.utils.query.optimize;
 
 import java.util.Map;
@@ -17,12 +32,10 @@ import org.openrdf.sesame.query.QueryResultsTable;
 import org.openrdf.model.Value;
 
 /**
- * Title: <br>
- * Description: <br>
- * Company: Clark & Parsia, LLC. <http://www.clarkparsia.com> <br>
- * Created: Feb 8, 2008 5:18:51 PM
+ * <p>Optimizer which removes type patterns that are unneeded.</p>
  *
- * @author Michael Grove <mike@clarkparsia.com>
+ * @author Michael Grove
+ * @since 1.0
  */
 public class TypeRemovalPatternOptimizer extends AbstractPatternOptimizer {
     KBStats mKbStats = new KBStats();
@@ -109,11 +122,7 @@ public class TypeRemovalPatternOptimizer extends AbstractPatternOptimizer {
                             "{s} prop {o} " +
                             "where range IN (select aType from {o} rdf:type {aType})";
 
-            // TODO: delete the someProperty assertion from the test pops KB to make sure props w/o instances that have
-            // a type in the domain of the property don't show up
-
-
-            // remember this is only useful when all the instances are typed, and props are used according to their
+            // TODO:  remember this is only useful when all the instances are typed, and props are used according to their
             // domain/range.  otherwise if there's no integrity to the data, ie using a proeprty on an instance of a type
             // where the property is not valid, then you can end up with the wrong results
 
@@ -150,11 +159,7 @@ public class TypeRemovalPatternOptimizer extends AbstractPatternOptimizer {
                             "{s} prop {o} " +
                             "where domain IN (select aType from {s} rdf:type {aType})";
 
-            //String aFilterQuery = aQuery + ", {s} rdf:type {d2} where domain != d2";
-
-            // TODO: delete the someProperty assertion from the test pops KB to make sure props w/o instances that have
-            // a type in the domain of the property don't show up
-            // remember this is only useful when all the instances are typed, and props are used according to their
+            // TODO: remember this is only useful when all the instances are typed, and props are used according to their
             // domain/range.  otherwise if there's no integrity to the data, ie using a proeprty on an instance of a type
             // where the property is not valid, then you can end up with the wrong results
 
@@ -174,7 +179,7 @@ public class TypeRemovalPatternOptimizer extends AbstractPatternOptimizer {
                     }
 
                     aSet.add(aDomain);
-//System.err.println("Domain: " + aProp + " -> " + aSet);
+
                     mDomainStats.put(aProp, aSet);
                 }
             }

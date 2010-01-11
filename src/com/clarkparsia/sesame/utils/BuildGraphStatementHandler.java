@@ -10,19 +10,13 @@ import org.openrdf.model.Resource;
 import org.openrdf.model.impl.GraphImpl;
 
 /**
- * <p>Title: </p>
+ * <p>Implementation of the Sesame StatementHandler interface which will add the statements to a Graph</p>
  *
- * <p>Description: </p>
- *
- * <p>Copyright: Copyright (c) 2006</p>
- *
- * <p>Company: Clark & Parsia, LLC. <http://www.clarkparsia.com></p>
- *
- * @author Michael Grove <mhgrove@hotmail.com>
- * @version 1.0
+ * @author Michael Grove
+ * @since 1.0
  */
-public class BuildGraphStatementHandler implements StatementHandler
-{
+
+public class BuildGraphStatementHandler implements StatementHandler {
     private Graph mGraph;
 
     public BuildGraphStatementHandler() {

@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2005-2010 Clark & Parsia, LLC. <http://www.clarkparsia.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.clarkparsia.sesame.utils;
 
 import org.openrdf.sesame.admin.AdminListener;
@@ -5,12 +20,10 @@ import org.openrdf.model.Statement;
 import org.apache.log4j.Logger;
 
 /**
- * Title: Log4jAdminListener<br/>
- * Description: Implementation of a Sesame {@link AdminListener} which routes all the admin messages to a Log4j logger instance.<br/>
- * Company: Clark & Parsia, LLC. <http://www.clarkparsia.com> <br/>
- * Created: May 1, 2009 12:32:36 PM <br/>
+ * <p>Implementation of a Sesame {@link AdminListener} which routes all the admin messages to a Log4j logger instance.</p>
  *
- * @author Michael Grove <mike@clarkparsia.com>
+ * @author Michael Grove
+ * @since 1.0
  */
 public class Log4jAdminListener implements AdminListener {
 	private Logger mLogger;

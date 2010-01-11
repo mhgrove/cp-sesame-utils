@@ -1,4 +1,17 @@
-// Copyright (c) 2005 - 2009, Clark & Parsia, LLC. <http://www.clarkparsia.com>
+/*
+ * Copyright (c) 2005-2010 Clark & Parsia, LLC. <http://www.clarkparsia.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package com.clarkparsia.sesame.utils.query.optimize;
 
@@ -20,12 +33,10 @@ import org.openrdf.sesame.sail.query.ValueExpr;
 import org.openrdf.model.Value;
 
 /**
- * Title: <br>
- * Description: <br>
- * Company: Clark & Parsia, LLC. <http://www.clarkparsia.com> <br>
- * Created: Jan 29, 2008 12:26:57 PM
+ * <p>Optimizer which will inline variables where appropriate.</p>
  *
- * @author Michael Grove <mike@clarkparsia.com>
+ * @author Michael Grove
+ * @since 1.0
  */
 public class VariableInlinePatternOptimizer extends AbstractPatternOptimizer {
 	private Collection<?> mDoNotInline;
@@ -74,11 +85,6 @@ public class VariableInlinePatternOptimizer extends AbstractPatternOptimizer {
                              aActuallyBoundVars.containsKey(aValCompare.getLeftArg())) {
                         aConstraintsToRemove.add(aCons);
                     }
-//                    else if (aValCompare.getLeftArg().getValue() == null && aValCompare.getRightArg().getValue() == null &&
-//                             aActuallyBoundVars.containsKey(aValCompare.getLeftArg()) && aActuallyBoundVars.containsKey(aValCompare.getRightArg())) {
-//                        // both unbound vars, but they're given values elsewhere, i think we can remove this clause and
-//                        // the value should be inlined due to their use in other place
-//                    }
                 }
             }
             else if (aCons instanceof And) {
@@ -90,28 +96,6 @@ public class VariableInlinePatternOptimizer extends AbstractPatternOptimizer {
                 }
             }
         }
-
-        // don't know if we need this code or not, but it actually removes vars marked as bound, but that somehow
-        // dont get used in a constraint, and thus, we should subst them into the graph pattern.
-//        Iterator aVarIter = aActuallyBoundVars.keySet().iterator();
-//        while (aVarIter.hasNext()) {
-//            Object aVar = aVarIter.next();
-//
-//            boolean found = false;
-//            Iterator consIter = aConstraintsToRemove.iterator();
-//            while (consIter.hasNext()) {
-//                BooleanExpr aCons = (BooleanExpr) consIter.next();
-//
-//                if (isInConstraint(aVar, aCons)) {
-//                    found = true;
-//                    break;
-//                }
-//            }
-//
-//            if (!found) {
-//                aVarIter.remove();
-//            }
-//        }
 
         GraphPattern aPattern = substVars(thePattern, aActuallyBoundVars);
 

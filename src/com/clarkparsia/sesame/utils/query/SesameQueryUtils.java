@@ -1,4 +1,17 @@
-// Copyright (c) 2005 - 2009, Clark & Parsia, LLC. <http://www.clarkparsia.com>
+/*
+ * Copyright (c) 2005-2010 Clark & Parsia, LLC. <http://www.clarkparsia.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 
 package com.clarkparsia.sesame.utils.query;
 
@@ -22,13 +35,12 @@ import org.openrdf.model.URI;
 import org.openrdf.model.BNode;
 
 /**
- * Title: SesameQueryUtils<br>
- * Description: Collection of utility methods for dealing with the Sesame Query API<br>
- * Company: Clark & Parsia, LLC. <http://www.clarkparsia.com> <br>
- * Created: Aug 16, 2007 11:45:42 AM
+ * <p>Collectino of utility methods for dealing with the Sesame Query API</p>
  *
- * @author Michael Grove <mike@clarkparsia.com>
+ * @author Michael Grove
+ * @since 1.0
  */
+
 public class SesameQueryUtils {
     public static final String SPARQL = "sparql";
 
@@ -150,43 +162,6 @@ public class SesameQueryUtils {
 
     }
 
-//    /**
-//     * Converts Query objects from one language to another.
-//     * @param theQuery the input query
-//     * @param theTarget the query language to convert to
-//     * @return the equivalent query represented in a different query language
-//     * @throws RuntimeException throw if there is an error while converting the query
-//     */
-//    public static String convertQuery(Query theQuery, String theTarget) throws RuntimeException {
-//        // only supporting serql to sparql right now
-//        // but evren has some code in the performance module that goes from sparql to serql (and iTQL)
-//        // which should probably be integrated at some point
-//        if (!theTarget.equals(SPARQL)) {
-//            throw new UnsupportedOperationException("Can only convert SeRQL -> SPARQL");
-//        }
-//
-//        // I will make no claims of the completeness or accuracy of this conversion code.  it will be good
-//        // enough to hold down the fort and do what we need to do for the time being, but i'm sure
-//        // there are probably some loopholes in the conversion, bnodes in sparql for one.
-//
-//        if (theQuery instanceof TableQuery) {
-//            // select queries are the most common, so lets try this first, see if we can parse in the incoming query as such
-//            TableQuery aTableQuery = (TableQuery) theQuery;
-//
-//            return getQueryRenderer(SPARQL).render(aTableQuery.getQuery());
-//        }
-//        else if (theQuery instanceof GraphQuery) {
-//            // ok, so it failed to parse as a table/select query, lets try a graph/construct query.  if this fails
-//            // then its something we cant convert...
-//            GraphQuery aGraphQuery = (GraphQuery) theQuery;
-//
-//            return QueryUtils.getQueryRenderer("sparql").render(aGraphQuery.getQuery());
-//        }
-//        else {
-//            throw new UnsupportedOperationException("Unknown query type");
-//        }
-//    }
-
     public static String getQueryString(Value theValue) {
         String aStr = theValue.toString();
 
@@ -217,19 +192,4 @@ public class SesameQueryUtils {
         }
         return -1;
     }
-
-	public static void main(String[] args) throws Exception {
-		String aQuery = "select a, NULL as \"b\", \"37\"^^<http://example.org> as \"c\" from {a} rdf:type {<http://www.example.org>}";
-		TableQuery tq = tableQuery(aQuery);
-		SelectQuery q = (SelectQuery) tq.getQuery();
-		for (int i = 0; i < q.getProjection().length; i++) {
-			System.err.println(q.getProjection()[i].getName());
-			System.err.println(q.getProjection()[i].getAlias());
-			System.err.println(q.getProjection()[i].getValueExpr());
-			System.err.println("---");
-		}
-
-		System.err.println(aQuery);
-		System.err.println(getQueryRenderer("serql").render(q));
-	}
 }

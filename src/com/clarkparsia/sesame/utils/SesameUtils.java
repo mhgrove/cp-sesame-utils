@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2005-2010 Clark & Parsia, LLC. <http://www.clarkparsia.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.clarkparsia.sesame.utils;
 
 import java.util.Set;
@@ -65,19 +80,12 @@ import com.clarkparsia.utils.Predicate;
 import com.clarkparsia.utils.collections.CollectionUtil;
 
 /**
- * <p>Title: </p>
+ * <p>Utility functions for working with the Sesame API</p>
  *
- * <p>Description: </p>
- *
- * <p>Copyright: Copyright (c) 2006</p>
- *
- * <p>Company: Clark & Parsia, LLC. <http://www.clarkparsia.com></p>
- *
- * @author Michael Grove <mhgrove@hotmail.com>
- * @version 1.0
+ * @author Michael Grove
+ * @since 1.0
  */
-public class SesameUtils
-{
+public class SesameUtils {
     private static final ValueFactory FACTORY = new ValueFactoryImpl();
 
 	public static ExtendedSesameRepository decorate(Graph theGraph) {
@@ -577,11 +585,5 @@ public class SesameUtils
 
 	private static ExtendedGraph decorateGraph(Graph theGraph) {
 		return new ExtendedGraph(theGraph);
-	}
-
-	public static void main(String[] args) throws Exception {
-		String aFile = "/Users/mhgrove/Desktop/clean.pops.production.model.ng.ttl";
-
-		Graph theGraph = SesameIO.readGraph(new FileInputStream(aFile), RDFFormat.TURTLE);
 	}
 }

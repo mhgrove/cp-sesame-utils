@@ -8,19 +8,14 @@ import org.openrdf.sesame.sail.query.PathExpression;
 import org.openrdf.sesame.sail.query.TriplePattern;
 
 /**
- * Title: <br>
- * Description: <br>
- * Company: Clark & Parsia, LLC. <http://www.clarkparsia.com> <br>
- * Created: Jan 29, 2008 12:20:49 PM
+ * <p>Very simple query optimizer that just pushes optionals and type triples to the end of the set of patterns.</p>
  *
- * @author Michael Grove <mike@clarkparsia.com>
+ * @author Michael Grove
+ * @since 1.0
  */
 public class SimplePatternOptimizer implements GraphPatternOptimizer {
 
     public GraphPattern optimize(GraphPattern thePattern) throws Exception {
-        // near brain dead query optimization
-        // so far, we're just moving the optionals to the very and of the query pattern and the type triples before that
-
         GraphPattern aOptimizedPattern = new GraphPattern();
 
         List aTypeAtoms = new ArrayList();

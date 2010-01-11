@@ -1,3 +1,18 @@
+/*
+ * Copyright (c) 2005-2010 Clark & Parsia, LLC. <http://www.clarkparsia.com>
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
 package com.clarkparsia.sesame.utils;
 
 import org.openrdf.model.Graph;
@@ -34,13 +49,11 @@ import com.clarkparsia.utils.collections.CollectionUtil;
 import com.clarkparsia.utils.Function;
 
 /**
- * Title: A decorated Sesame graph object which provides utility functions for many common operations not present in
- * Sesame's API.<br/>
- * Description: <br/>
- * Company: Clark & Parsia, LLC. <http://www.clarkparsia.com> <br/>
- * Created: Jun 2, 2009 2:46:04 PM <br/>
+ * <p>A decorator for a Sesame graph which provides some useful utility functions for common operations not present in
+ * the Sesame core API.</p>
  *
- * @author Michael Grove <mike@clarkparsia.com>
+ * @author Michael Grove
+ * @since 1.0
  */
 public class ExtendedGraph extends DecoratableGraph implements Graph, Iterable<Statement> {
 
@@ -73,7 +86,7 @@ public class ExtendedGraph extends DecoratableGraph implements Graph, Iterable<S
 	 * @inheritDoc
 	 */
 	public Iterator<Statement> iterator() {
-		return new StatementIteratorAsIterator(getStatements());
+		return new StmtIterator(getStatements());
 	}
 
 	/**
@@ -151,7 +164,7 @@ public class ExtendedGraph extends DecoratableGraph implements Graph, Iterable<S
 	public Iterator<Value> getValues(Resource theSubj, URI thePred) {
         StatementIterator sIter = getStatements(theSubj, thePred, null);
 
-		return CollectionUtil.transform(new StatementIteratorAsIterator(sIter), new Function<Statement, Value>() {
+		return CollectionUtil.transform(new StmtIterator(sIter), new Function<Statement, Value>() {
 			public Value apply(final Statement theIn) {
 				return theIn.getObject();
 			}
