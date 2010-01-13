@@ -28,13 +28,23 @@ import org.openrdf.model.Value;
  * @since 1.0
  */
 public class BuildRepositoryStatementHandler implements StatementHandler {
+
+	/**
+	 * The repository statements will be added to
+	 */
     private RdfRepository mRepository;
 
+	/**
+	 * Create a new BuildRepositoryStatementHandler
+	 * @param theRepository the Repository to append statements to
+	 */
     public BuildRepositoryStatementHandler(RdfRepository theRepository) {
         mRepository = theRepository;
-        //mRepository.startTransaction();
     }
 
+	/**
+	 * @inheritDoc
+	 */
     public void handleStatement(Resource theSubject, URI thePredicate, Value theObject) {
         try {
             mRepository.addStatement(theSubject, thePredicate, theObject);

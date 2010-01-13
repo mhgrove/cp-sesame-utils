@@ -17,16 +17,30 @@ import org.openrdf.model.impl.GraphImpl;
  */
 
 public class BuildGraphStatementHandler implements StatementHandler {
+
+	/**
+	 * The Graph to add the statements to
+	 */
     private Graph mGraph;
 
+	/**
+	 * Create a new BuildGraphStatementHandler
+	 */
     public BuildGraphStatementHandler() {
         mGraph = new GraphImpl();
     }
 
+	/**
+	 * Create a new BuildGraphStatementHandler which will append new statements to the provided Graph
+	 * @param theGraph
+	 */
     public BuildGraphStatementHandler(Graph theGraph) {
         mGraph = theGraph;
     }
 
+	/**
+	 * @inheritDoc
+	 */
     public void handleStatement(Resource theSubject, URI thePredicate, Value theObject) {
         try {
             mGraph.add(theSubject, thePredicate, theObject);
@@ -36,6 +50,10 @@ public class BuildGraphStatementHandler implements StatementHandler {
         }
     }
 
+	/**
+	 * Return the Graph built by this StatementHandler
+	 * @return the graph
+	 */
     public Graph getGraph() {
         return mGraph;
     }

@@ -53,6 +53,7 @@ import java.util.Set;
 import java.util.LinkedHashSet;
 import java.util.HashSet;
 import java.util.Iterator;
+import java.util.Collections;
 
 /**
  * <p>Decorator for a SesameRepository that adds some utility functions, very similar in scope and function to
@@ -62,6 +63,18 @@ import java.util.Iterator;
  * @since 1.0
  */
 public class ExtendedSesameRepository extends BaseSesameRepository implements SesameRepository {
+
+	/**
+	 * Create an in-memory ExtendedSesameRepository
+	 */
+	public ExtendedSesameRepository() {
+		this(SesameUtils.createInMemSource());
+	}
+
+	/**
+	 * Wrap the provided SesameRepository as an ExtendedSesameRepository
+	 * @param theRepo the repository to decorate
+	 */
 	public ExtendedSesameRepository(SesameRepository theRepo) {
 		super(theRepo);
 
@@ -69,11 +82,27 @@ public class ExtendedSesameRepository extends BaseSesameRepository implements Se
 		// make a lot of that junk moot
 	}
 
+	/**
+	 * List all the subjects which have the given predicate and object.
+	 * @param thePredicate the predicate to search for, or null for any predicate
+	 * @param theObject the object to search for, or null for any object
+	 * @return the list of subjects who have properties matching the po pattern.
+	 */
 	public Iterable<Resource> getSubjects(URI thePredicate, Value theObject) {
 		return CollectionUtil.list(SesameUtils.getSubjects(this, thePredicate, theObject));
 	}
 
+	/**
+	 * Return the values of the subject for the given property
+	 * @param theSubj the subject
+	 * @param thePred the property of the subject to get values for
+	 * @return an iterable set of values of the property
+	 */
 	public Iterable<Value> getValues(Resource theSubj, URI thePred) {
+		if (theSubj == null || thePred == null) {
+			return Collections.emptySet();
+		}
+
         try {
             String aQuery = "select value from {"+ SesameQueryUtils.getQueryString(theSubj)+"} <"+thePred+"> {value}";
 
@@ -92,6 +121,11 @@ public class ExtendedSesameRepository extends BaseSesameRepository implements Se
         return new HashSet<Value>();
 	}
 
+	/**
+	 * Return whether or not the given resource represents an rdf:List.
+	 * @param theRes the resource to inspect
+	 * @return true if it is an rdf:List, false otherwise
+	 */
 	public boolean isList(Resource theRes) {
 		return theRes.equals(URIImpl.RDF_NIL) || getValue(theRes, URIImpl.RDF_FIRST) != null;
 	}
@@ -151,6 +185,15 @@ public class ExtendedSesameRepository extends BaseSesameRepository implements Se
         }
 	}
 
+	/**
+	 * Perform a select query on this repository
+	 * @param theQuery the query to execute
+	 * @return the results of the query
+	 * @throws AccessDeniedException if the current user cannot access this repository
+	 * @throws IOException if there is an error during IO of the query
+	 * @throws MalformedQueryException if the provided query string is not valid
+	 * @throws QueryEvaluationException thrown if there is an error while evaluating the query
+	 */
 	public IterableQueryResultsTable performSelectQuery(SesameQuery theQuery) throws AccessDeniedException,
 																					 IOException,
 																					 MalformedQueryException,
@@ -158,16 +201,36 @@ public class ExtendedSesameRepository extends BaseSesameRepository implements Se
 		return performSelectQuery(theQuery.getLanguage(), theQuery.getQueryString());
 	}
 
+	/**
+	 * Perform a construct query on this Repository
+	 * @param theQuery the construct query to execute
+	 * @return the results of the construct query
+	 * @throws AccessDeniedException thrown if the current user cannot access this Repository
+	 * @throws IOException thrown if there is an error during IO of the query or results
+	 * @throws MalformedQueryException thrown if the provided query is not valid
+	 * @throws QueryEvaluationException thrown if there is an error while evaluating the query
+	 */
 	public ExtendedGraph performConstructQuery(SesameQuery theQuery) throws AccessDeniedException, IOException,
 																			MalformedQueryException,
 																			QueryEvaluationException {
 		return new ExtendedGraph(performGraphQuery(theQuery.getLanguage(), theQuery.getQueryString()));
 	}
 
+	/**
+	 * Return an Iterable set of statements over this SesameRepository.
+	 * @return the statements in this repository as an Iterable
+	 */
 	public Iterable<Statement> getStatements() {
 		return getStatements(null, null, null);
 	}
 
+	/**
+	 * Return an Iterable over the statements in this Repository which match the given spo pattern.
+	 * @param theSubj the subject to search for, or null for any
+	 * @param thePred the predicate to search for, or null for any
+	 * @param theObj the object to search for, or null for any
+	 * @return an Iterable over the matching statements
+	 */
 	public Iterable<Statement> getStatements(Resource theSubj, URI thePred, Value theObj) {
         String aQuery = "construct * from {s} p {o} ";
 
@@ -205,16 +268,33 @@ public class ExtendedSesameRepository extends BaseSesameRepository implements Se
         }
 	}
 
+	/**
+	 * Return a graph which describes the given URI
+	 * @param theURI the URI to describe
+	 * @return the graph which describes the URI
+	 */
 	public ExtendedGraph describe(URI theURI) {
 		// TODO: need a null check for theURI
 		// TODO: make this align closer to a SPARQL describe
 		return new ExtendedGraph(getStatements(theURI, null, null));
 	}
 
+	/**
+	 * Write the contents of the Repository to the stream in the given format
+	 * @param theStream the stream to write to
+	 * @param theFormat the format to write the RDF as
+	 * @throws IOException thrown if there is an error while writing to the stream
+	 */
 	public void write(OutputStream theStream, RDFFormat theFormat) throws IOException {
 		write(new OutputStreamWriter(theStream), theFormat);
 	}
 
+	/**
+	 * Write the contents of the Repository to the Writer in the given RDF format
+	 * @param theStream the stream to write to
+	 * @param theFormat the format to write the RDF as
+	 * @throws IOException thrown if there is an error while writing to the stream
+	 */
 	public void write(Writer theStream, RDFFormat theFormat) throws IOException {
 		try {
 			IOUtil.transfer(new InputStreamReader(extractRDF(theFormat, true, true, true, true)), theStream);
@@ -226,6 +306,11 @@ public class ExtendedSesameRepository extends BaseSesameRepository implements Se
 		}
 	}
 
+	/**
+	 * Add the statements to the repository
+	 * @param theStatement the statement(s) to add
+	 * @throws IOException thrown if there is an error while adding
+	 */
 	public void add(Statement... theStatement) throws IOException {
 		try {
 			addGraph(SesameUtils.asGraph(theStatement));
@@ -235,6 +320,13 @@ public class ExtendedSesameRepository extends BaseSesameRepository implements Se
 		}
 	}
 
+	/**
+	 * Read data in the specified format from the stream and insert it into this Repository
+	 * @param theStream the stream to read data from
+	 * @param theFormat the format the data is in
+	 * @throws IOException thrown if there is an error while reading from the stream
+	 * @throws ParseException thrown if the data cannot be parsed into the specified format
+	 */
 	public void read(InputStream theStream, RDFFormat theFormat) throws IOException, ParseException {
 		try {
 			addData(SesameIO.readRepository(theStream, theFormat), new StdOutAdminListener());
@@ -244,6 +336,12 @@ public class ExtendedSesameRepository extends BaseSesameRepository implements Se
 		}
 	}
 
+	/**
+	 * Return the value of the property on the resource
+	 * @param theSubj the subject
+	 * @param thePred the property to get from the subject
+	 * @return the first value of the property for the resource, or null if it does not have the specified property or does not exist.
+	 */
 	public Value getValue(Resource theSubj, URI thePred) {
         Iterable<Value> aIter = getValues(theSubj, thePred);
 
@@ -255,6 +353,13 @@ public class ExtendedSesameRepository extends BaseSesameRepository implements Se
 		}
 	}
 
+	/**
+	 * Return the value of the property on the resource as a literal
+	 * @param theSubj the subject
+	 * @param thePred the property to get from the subject
+	 * @return the value of the property
+	 * @see #getValue
+	 */
 	public Literal getLiteral(Resource theSubj, URI thePred) {
 		return (Literal) getValue(theSubj, thePred);
 	}

@@ -44,22 +44,42 @@ public class StmtIterator implements StatementIterator, Iterator<Statement>, Ite
         mIter = aList.iterator();
     }
 
+	/**
+	 * Wrap the Sesame StatementIterator as a StmtIterator
+	 * @param theIter the Sesame StatementIterator to wrap
+	 */
 	public StmtIterator(StatementIterator theIter) {
 		this(new StatementIteratorAsIterator(theIter));
 	}
 
+	/**
+	 * Wrap the Iterable of Statements as a StmtIterator
+	 * @param theIter the Iterable to wrap
+	 */
 	public StmtIterator(Iterable<Statement> theIter) {
 		this(theIter.iterator());
 	}
 
+	/**
+	 * Wrap the Iterator over some Statements as a StmtIterator
+	 * @param theIter the iterator to wrap
+	 */
     public StmtIterator(Iterator<Statement> theIter) {
         mIter = theIter;
     }
 
+	/**
+	 * Create a new StmtIterator over the List of statements
+	 * @param theList the list of statements to iterate over
+	 */
     public StmtIterator(List<Statement> theList) {
         this(theList.iterator());
     }
 
+	/**
+	 * Create a new StmtIterator over the array of statements
+	 * @param theStmts the statements to iterate over
+	 */
     public StmtIterator(Statement[] theStmts) {
         this(Arrays.asList(theStmts));
     }
@@ -119,8 +139,15 @@ public class StmtIterator implements StatementIterator, Iterator<Statement>, Ite
 	 * @since 1.0
 	 */
 	private static class StatementIteratorAsIterator implements Iterator<Statement> {
+
+		/**
+		 * The underlying sesame StatementIterator
+		 */
 		private StatementIterator mIter;
 
+		/**
+		 * Whether or not to automatically close the underlying Sesame StatementIterator when iteration is complete
+		 */
 		private boolean mAutoClose = false;
 
 		/**
@@ -142,10 +169,16 @@ public class StmtIterator implements StatementIterator, Iterator<Statement>, Ite
 			mAutoClose = theAutoClose;
 		}
 
+		/**
+		 * @inheritDoc
+		 */
 		public boolean hasNext() {
 			return mIter.hasNext();
 		}
 
+		/**
+		 * @inheritDoc
+		 */
 		public Statement next() {
 			Statement aNext = mIter.next();
 
@@ -156,10 +189,16 @@ public class StmtIterator implements StatementIterator, Iterator<Statement>, Ite
 			return aNext;
 		}
 
+		/**
+		 * Close this iterator and any resources associated with it.
+		 */
 		public void close() {
 			mIter.close();
 		}
 
+		/**
+		 * @inheritDoc
+		 */
 		public void remove() {
 			throw new IllegalArgumentException();
 		}

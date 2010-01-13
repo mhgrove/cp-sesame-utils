@@ -26,32 +26,58 @@ import org.apache.log4j.Logger;
  * @since 1.0
  */
 public class Log4jAdminListener implements AdminListener {
+
+	/**
+	 * The logger to dispatch messages to
+	 */
 	private Logger mLogger;
 
+	/**
+	 * Create a new Log4jAdminListener
+	 * @param theLogger the logger to use
+	 */
 	public Log4jAdminListener(Logger theLogger) {
 		mLogger = theLogger;
 	}
 
+	/**
+	 * @inheritDoc
+	 */
 	public void transactionStart() {
 		mLogger.info("Transaction Started");
 	}
 
+	/**
+	 * @inheritDoc
+	 */
 	public void transactionEnd() {
 		mLogger.info("Transaction Ended");
 	}
 
+	/**
+	 * @inheritDoc
+	 */
 	public void status(String theMsg, int theLine, int theCol) {
 		mLogger.info("Status [" + theLine + ":" + theCol + "]: " + theMsg); 
 	}
 
+	/**
+	 * @inheritDoc
+	 */
 	public void notification(String theMsg, int theLine, int theCol, Statement theStatement) {
 		mLogger.info("Notification [" + theLine + ":" + theCol + "]: " + theMsg + " -- " + theStatement);
 	}
 
+	/**
+	 * @inheritDoc
+	 */
 	public void warning(String theMsg, int theLine, int theCol, Statement theStatement) {
 		mLogger.warn("Warning [" + theLine + ":" + theCol + "]: " + theMsg + " -- " + theStatement);
 	}
 
+	/**
+	 * @inheritDoc
+	 */
 	public void error(String theMsg, int theLine, int theCol, Statement theStatement) {
 		mLogger.error("Error [" + theLine + ":" + theCol + "]: " + theMsg + " -- " + theStatement);
 	}

@@ -16,43 +16,46 @@
 package com.clarkparsia.sesame.utils;
 
 import org.openrdf.sesame.constants.RDFFormat;
-import org.openrdf.sesame.constants.QueryLanguage;
+
 import org.openrdf.sesame.repository.SesameRepository;
-import org.openrdf.sesame.admin.DummyAdminListener;
-import org.openrdf.sesame.admin.StdOutAdminListener;
+
 import org.openrdf.sesame.admin.AdminMsgCollector;
 import org.openrdf.sesame.admin.AdminMsg;
+
 import org.openrdf.sesame.config.AccessDeniedException;
+
 import org.openrdf.sesame.sail.StatementIterator;
-import org.openrdf.sesame.Sesame;
+
 import org.openrdf.model.Graph;
 import org.openrdf.model.Statement;
+
 import org.openrdf.model.impl.GraphImpl;
+
 import org.openrdf.rio.turtle.TurtleParser;
 import org.openrdf.rio.turtle.TurtleWriter;
+
 import org.openrdf.rio.StatementHandler;
 import org.openrdf.rio.Parser;
 import org.openrdf.rio.ParseException;
 import org.openrdf.rio.StatementHandlerException;
 import org.openrdf.rio.RdfDocumentWriter;
+
 import org.openrdf.rio.ntriples.NTriplesParser;
 import org.openrdf.rio.ntriples.NTriplesWriter;
+
 import org.openrdf.rio.rdfxml.RdfXmlParser;
 import org.openrdf.rio.rdfxml.RdfXmlWriter;
+
 import org.openrdf.util.io.IOUtil;
 
 import java.net.URL;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.Writer;
-import java.io.StringReader;
-import java.io.File;
 
-import com.clarkparsia.sesame.utils.query.Binding;
-import com.clarkparsia.sesame.utils.query.IterableQueryResultsTable;
-import com.clarkparsia.sesame.utils.query.SesameQueryUtils;
 import com.clarkparsia.sesame.repository.ExtendedSesameRepository;
 
 /**
@@ -62,6 +65,15 @@ import com.clarkparsia.sesame.repository.ExtendedSesameRepository;
  * @since 1.0
  */
 public class SesameIO {
+
+	/**
+	 * Read the RDF at the URL using the specified format and insert it into a SesameRepository
+	 * @param theFile the URL to read from
+	 * @param theFormat the format the data is in
+	 * @return the RDF from the URL as a SesameRepository
+	 * @throws IOException if there is an error while reading
+	 * @throws ParseException if there is an error while trying to parse the data as the specified format
+	 */
 	public static ExtendedSesameRepository readRepository(URL theFile, RDFFormat theFormat) throws IOException, ParseException {
 		InputStream aStream = theFile.openStream();
 
@@ -73,6 +85,14 @@ public class SesameIO {
 		}
 	}
 
+	/**
+	 * Read the RDF from the stream using the specified format and insert it into a SesameRepository
+	 * @param theStream the stream to read from
+	 * @param theFormat the format the data is in
+	 * @return the RDF from the stream as a SesameRepository
+	 * @throws IOException if there is an error while reading
+	 * @throws ParseException if there is an error while trying to parse the data as the specified format
+	 */
 	public static ExtendedSesameRepository readRepository(InputStream theStream, RDFFormat theFormat) throws IOException, ParseException {
 		InputStreamReader aReader = new InputStreamReader(theStream);
 
@@ -84,6 +104,14 @@ public class SesameIO {
 		}
 	}
 
+	/**
+	 * Read the RDF from the source using the specified format and insert it into a Repository
+	 * @param theReader the stream to read from
+	 * @param theFormat the format the data is in
+	 * @return the RDf represented by the reader inserted into a SesameRepository
+	 * @throws IOException if there is an error while reading
+	 * @throws ParseException if there is an error while trying to parse the data as the specified format
+	 */
 	public static ExtendedSesameRepository readRepository(Reader theReader, RDFFormat theFormat) throws IOException, ParseException {
 		SesameRepository aRepo = SesameUtils.createInMemSource();
 
@@ -107,6 +135,14 @@ public class SesameIO {
 		return new ExtendedSesameRepository(aRepo);
 	}
 
+	/**
+	 * Read an RDF graph from the URI using the specified format
+	 * @param theFile the URL to read from
+	 * @param theFormat the format the data is in
+	 * @return the graph represented by the data at the URL
+	 * @throws IOException if there is an error while reading from the URL
+	 * @throws ParseException if there is an error while trying to parse the data as the specified format
+	 */
 	public static ExtendedGraph readGraph(URL theFile, RDFFormat theFormat) throws IOException, ParseException {
 		InputStream aStream = theFile.openStream();
 
@@ -118,6 +154,14 @@ public class SesameIO {
 		}
 	}
 
+	/**
+	 * Read an RDF graph from the stream using the specified format
+	 * @param theStream the stream to read from
+	 * @param theFormat the format the data is in
+	 * @return the graph represented by the data from the stream
+	 * @throws IOException if there is an error while reading
+	 * @throws ParseException if there is an error while trying to parse the data as the specified format
+	 */
 	public static ExtendedGraph readGraph(InputStream theStream, RDFFormat theFormat) throws IOException, ParseException {
 		InputStreamReader aReader = new InputStreamReader(theStream);
 
@@ -129,6 +173,14 @@ public class SesameIO {
 		}
 	}
 
+	/**
+	 * Read an RDF graph from the reader in the specified format
+	 * @param theReader the stream to read from
+	 * @param theFormat the RDF format the data is in
+	 * @return the Graph represented by the data from the reader
+	 * @throws IOException thrown if there is an error while reading
+	 * @throws ParseException thrown if there is an error trying to parse the data into the specified format
+	 */
 	public static ExtendedGraph readGraph(Reader theReader, RDFFormat theFormat) throws IOException, ParseException {
         Graph aGraph = new GraphImpl();
 
@@ -160,6 +212,13 @@ public class SesameIO {
 		return new ExtendedGraph(aGraph);
 	}
 
+	/**
+	 * Write the contents of the Graph to the writer in the specified RDF format
+	 * @param theGraph the graph to write
+	 * @param theWriter the stream to write to
+	 * @param theFormat the RDF format to write in
+	 * @throws IOException thrown if there is an error while writing
+	 */
 	public static void writeGraph(Graph theGraph, Writer theWriter, RDFFormat theFormat) throws IOException {
 		RdfDocumentWriter aRdfWriter;
 
@@ -179,6 +238,13 @@ public class SesameIO {
 		writeGraph(theGraph, aRdfWriter);
 	}
 
+	/**
+	 * Write the contents of the SesameRepository to the writer in the given format
+	 * @param theRepo the repository to write
+	 * @param theWriter the writer to write the data to
+	 * @param theFormat the RDF format to write the data in
+	 * @throws IOException thrown if there is an error while writing
+	 */
 	public static void writeGraph(SesameRepository theRepo, Writer theWriter, RDFFormat theFormat) throws IOException {
 		try {
 			IOUtil.transfer(new InputStreamReader(theRepo.extractRDF(theFormat, true, true, true, true)),
@@ -189,6 +255,12 @@ public class SesameIO {
 		}
 	}
 
+	/**
+	 * Write the Graph using the provided writer
+	 * @param theGraph the graph to write
+	 * @param theWriter the writer to use for writing
+	 * @throws IOException thrown if there is an error while writing
+	 */
     private static void writeGraph(Graph theGraph, RdfDocumentWriter theWriter) throws IOException {
         theWriter.startDocument();
         StatementIterator sIter = theGraph.getStatements();
@@ -197,6 +269,7 @@ public class SesameIO {
             Statement aStmt = sIter.next();
             theWriter.writeStatement(aStmt.getSubject(), aStmt.getPredicate(), aStmt.getObject());
         }
+
         theWriter.endDocument();
         sIter.close();
     }
