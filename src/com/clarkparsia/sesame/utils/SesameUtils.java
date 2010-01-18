@@ -546,7 +546,7 @@ public class SesameUtils {
 
 	@Deprecated
     public static Iterator<Value> getValues(Graph theGraph, Resource theSubj, URI thePred) {
-		return decorateGraph(theGraph).getValues(theSubj, thePred);
+		return decorateGraph(theGraph).getValues(theSubj, thePred).iterator();
     }
 
 	@Deprecated

@@ -45,8 +45,11 @@ import java.io.StringReader;
 import com.clarkparsia.utils.io.IOUtil;
 
 import com.clarkparsia.utils.collections.CollectionUtil;
+import static com.clarkparsia.utils.collections.CollectionUtil.transform;
 
 import com.clarkparsia.utils.Function;
+import com.clarkparsia.utils.FunctionUtil;
+import static com.clarkparsia.utils.FunctionUtil.compose;
 
 /**
  * <p>A decorator for a Sesame graph which provides some useful utility functions for common operations not present in
@@ -70,6 +73,45 @@ public class ExtendedGraph extends DecoratableGraph implements Graph, Iterable<S
 	 */
 	public ExtendedGraph(Graph theGraph) {
 		super(theGraph);
+	}
+
+	/**
+	 * Method which proxies for {@link #getStatements} but instead returns a {@link StmtIterator} which allows these calls
+	 * to be used in for-each loops.
+	 * @return an iterator over all statements in the graph
+	 */
+	public StmtIterator statements() {
+		return new StmtIterator(getStatements());
+	}
+
+	/**
+	 * Return the superclasses of the given resource
+	 * @param theRes the resource
+	 * @return the resource's superclasses
+	 */
+	public Iterable<Resource> getSuperclasses(Resource theRes) {
+		return transform(statements(theRes, URIImpl.RDFS_SUBCLASSOF, null), compose(new StatementToValue(Position.Object), new FunctionUtil.Cast<Value, Resource>(Resource.class)));
+	}
+
+	/**
+	 * Return the subclasses of the given resource
+	 * @param theRes the resource
+	 * @return the subclasses of the resource
+	 */
+	public Iterable<Resource> getSubclasses(Resource theRes) {
+		return transform(statements(null, URIImpl.RDFS_SUBCLASSOF, theRes), compose(new StatementToValue(Position.Subject), new FunctionUtil.Cast<Value, Resource>(Resource.class)));
+	}
+
+	/**
+	 * Method which proxies for {@link #getStatements} but instead returns a {@link StmtIterator} over all statements
+	 * matching the provided spo pattern.
+	 * @param theSubj the subject to match, or null for any
+	 * @param thePred the predicate to match, or null for any
+	 * @param theObj the object to match, or null for any
+	 * @return a StmtIterator over all matching statements
+	 */
+	public StmtIterator statements(Resource theSubj, URI thePred, Value theObj) {
+		return new StmtIterator(getStatements(theSubj, thePred, theObj));
 	}
 
 	/**
@@ -143,7 +185,7 @@ public class ExtendedGraph extends DecoratableGraph implements Graph, Iterable<S
 	 * @return the value of the the property for the subject, or null if there is no value.
 	 */
 	public Value getValue(Resource theSubj, URI thePred) {
-		Iterator<Value> aIter = getValues(theSubj, thePred);
+		Iterator<Value> aIter = getValues(theSubj, thePred).iterator();
 
 		if (aIter.hasNext()) {
 			return aIter.next();
@@ -153,28 +195,61 @@ public class ExtendedGraph extends DecoratableGraph implements Graph, Iterable<S
 		}
 	}
 
+	/**
+	 * Return the rdf:type of the resource
+	 * @param theSubj the resource
+	 * @return the rdf:type, or null if it is not typed.
+	 */
 	public URI getType(Resource theSubj) {
 		return (URI) getValue(theSubj, URIImpl.RDF_TYPE);
 	}
 
+	/**
+	 * Return the value of of the property as a Literal
+	 * @param theRes the resource
+	 * @param theProp the property whose value is to be retrieved
+	 * @return the property value as a literal, or null if the value is not a literal, or the property does not have a value
+	 */
 	public Literal getLiteral(Resource theRes, URI theProp) {
-		return (Literal) getValue(theRes, theProp);
+		try {
+			return (Literal) getValue(theRes, theProp);
+		}
+		catch (ClassCastException e) {
+			return null;
+		}
 	}
 
-	public Iterator<Value> getValues(Resource theSubj, URI thePred) {
+	/**
+	 * Return an Iterable over all the values of the property on the given resource
+	 * @param theSubj the resource
+	 * @param thePred the property
+	 * @return all values of the property on the resource.
+	 */
+	public Iterable<Value> getValues(Resource theSubj, URI thePred) {
         StatementIterator sIter = getStatements(theSubj, thePred, null);
 
 		return CollectionUtil.transform(new StmtIterator(sIter), new Function<Statement, Value>() {
 			public Value apply(final Statement theIn) {
 				return theIn.getObject();
 			}
-		}).iterator();
+		});
 	}
 
+	/**
+	 * Return whether or not the resource has the specified property
+	 * @param theRes the resource
+	 * @param theProp the property
+	 * @return true if the resource has at least one assertion of the given property.
+	 */
 	public boolean hasProperty(Resource theRes, URI theProp) {
-		return getValues(theRes, theProp).hasNext();
+		return getValues(theRes, theProp).iterator().hasNext();
 	}
 
+	/**
+	 * Return the rdfs:label of the given resource
+	 * @param theRes the resource to get a label for
+	 * @return the rdfs:label of the resource, or null if it does not have one
+	 */
 	public Value label(Resource theRes) {
 		return getValue(theRes, URIImpl.RDFS_LABEL);
 	}
@@ -243,6 +318,12 @@ public class ExtendedGraph extends DecoratableGraph implements Graph, Iterable<S
 		SesameIO.writeGraph(this, theWriter, theFormat);
 	}
 
+	/**
+	 * Write the contents of this graph in the specified format to the output stream
+	 * @param theStream the stream to write to
+	 * @param theFormat the format to write the data in
+	 * @throws IOException if there is an error while writing to the stream
+	 */
 	public void write(OutputStream theStream, RDFFormat theFormat) throws IOException {
 		write(new OutputStreamWriter(theStream), theFormat);
 	}
@@ -287,6 +368,32 @@ public class ExtendedGraph extends DecoratableGraph implements Graph, Iterable<S
 
 		if (aGraph != null) {
 			add(aGraph);
+		}
+	}
+
+	enum Position {
+		Subject, Predicate, Object
+	}
+
+	private class StatementToValue implements Function<Statement, Value> {
+
+		private Position mPosition;
+
+		private StatementToValue(Position thePos) {
+			mPosition = thePos;
+		}
+
+		public Value apply(final Statement theIn) {
+			switch (mPosition) {
+				case Subject:
+					return theIn.getSubject();
+				case Predicate:
+					return theIn.getPredicate();
+				case Object:
+					return theIn.getObject();
+				default:
+					return null;
+			}
 		}
 	}
 }

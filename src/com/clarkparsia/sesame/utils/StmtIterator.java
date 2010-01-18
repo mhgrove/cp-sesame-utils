@@ -148,7 +148,7 @@ public class StmtIterator implements StatementIterator, Iterator<Statement>, Ite
 		/**
 		 * Whether or not to automatically close the underlying Sesame StatementIterator when iteration is complete
 		 */
-		private boolean mAutoClose = false;
+		private boolean mAutoClose = true;
 
 		/**
 		 * Create a new StatementIteratorAsIterator
