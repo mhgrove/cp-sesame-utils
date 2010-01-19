@@ -36,6 +36,10 @@ public class IterableQueryResultsTable implements Iterable<Binding> {
         mTable = theTable;
     }
 
+	public int size() {
+		return mTable.getRowCount();
+	}
+
     public static IterableQueryResultsTable iterable(QueryResultsTable theTable) {
         return new IterableQueryResultsTable(theTable);
     }

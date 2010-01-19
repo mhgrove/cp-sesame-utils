@@ -26,6 +26,9 @@ import org.openrdf.model.impl.GraphImpl;
 import org.openrdf.vocabulary.XmlSchema;
 import org.openrdf.sesame.constants.RDFFormat;
 import org.openrdf.sesame.sail.StatementIterator;
+import org.openrdf.sesame.query.MalformedQueryException;
+import org.openrdf.sesame.query.QueryEvaluationException;
+import org.openrdf.sesame.config.AccessDeniedException;
 import org.openrdf.rio.ParseException;
 
 import java.util.Iterator;
@@ -50,6 +53,8 @@ import static com.clarkparsia.utils.collections.CollectionUtil.transform;
 import com.clarkparsia.utils.Function;
 import com.clarkparsia.utils.FunctionUtil;
 import static com.clarkparsia.utils.FunctionUtil.compose;
+import com.clarkparsia.sesame.utils.query.SesameQuery;
+import com.clarkparsia.sesame.utils.query.IterableQueryResultsTable;
 
 /**
  * <p>A decorator for a Sesame graph which provides some useful utility functions for common operations not present in
@@ -371,7 +376,20 @@ public class ExtendedGraph extends DecoratableGraph implements Graph, Iterable<S
 		}
 	}
 
-	enum Position {
+	/**
+	 * Perform the select query on this graph
+	 * @param theQuery the query to execute
+	 * @return the results of the query
+	 * @throws MalformedQueryException if the query is not in valid syntax
+	 * @throws IOException if there is an error while sending the query
+	 * @throws QueryEvaluationException if there is an error while evaluating the query
+	 * @throws AccessDeniedException if this graph cannot be accessed.
+	 */
+	public IterableQueryResultsTable query(SesameQuery theQuery) throws MalformedQueryException, IOException, QueryEvaluationException, AccessDeniedException {
+		return SesameUtils.decorate(this).performSelectQuery(theQuery);
+	}
+
+	private enum Position {
 		Subject, Predicate, Object
 	}
 

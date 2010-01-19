@@ -493,7 +493,7 @@ public class SesameUtils {
 
 	@Deprecated
     public static StmtIterator getStatements(SesameRepository theRepo, Resource theSubj, URI thePred, Value theObj) {
-		return new StmtIterator(decorate(theRepo).getStatements(theSubj, thePred, theObj));
+		return new StmtIterator((Iterator<Statement>) decorate(theRepo).getStatements(theSubj, thePred, theObj));
     }
 
     public static boolean isType(Graph theGraph, URI theRes, Resource theType) {

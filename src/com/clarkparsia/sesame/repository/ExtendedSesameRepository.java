@@ -41,7 +41,10 @@ import com.clarkparsia.sesame.utils.query.SesameQuery;
 import com.clarkparsia.sesame.utils.query.SesameQueryUtils;
 import com.clarkparsia.sesame.utils.query.Binding;
 import com.clarkparsia.utils.collections.CollectionUtil;
+import static com.clarkparsia.utils.collections.CollectionUtil.transform;
 import com.clarkparsia.utils.Function;
+import com.clarkparsia.utils.FunctionUtil;
+import static com.clarkparsia.utils.FunctionUtil.compose;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -80,6 +83,17 @@ public class ExtendedSesameRepository extends BaseSesameRepository implements Se
 
 		// TODO: maybe move all the stuff we use from sesame utils into here?  this class should
 		// make a lot of that junk moot
+	}
+
+	/**
+	 * Return the superclasses of the given resource
+	 * @param theRes the resource
+	 * @return the resource's superclasses
+	 */
+	public Iterable<Resource> getSuperclasses(Resource theRes) {
+		return transform(getStatements(theRes, URIImpl.RDFS_SUBCLASSOF, null).iterator(),
+						 compose(new Function<Statement, Value>() {public Value apply(Statement theStmt) { return theStmt.getObject(); } },
+								 new FunctionUtil.Cast<Value, Resource>(Resource.class)));
 	}
 
 	/**
@@ -231,7 +245,7 @@ public class ExtendedSesameRepository extends BaseSesameRepository implements Se
 	 * @param theObj the object to search for, or null for any
 	 * @return an Iterable over the matching statements
 	 */
-	public Iterable<Statement> getStatements(Resource theSubj, URI thePred, Value theObj) {
+	public StmtIterator getStatements(Resource theSubj, URI thePred, Value theObj) {
         String aQuery = "construct * from {s} p {o} ";
 
         try {
