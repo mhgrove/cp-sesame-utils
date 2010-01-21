@@ -57,6 +57,7 @@ import java.io.Reader;
 import java.io.Writer;
 
 import com.clarkparsia.sesame.repository.ExtendedSesameRepository;
+import com.clarkparsia.utils.io.Encoder;
 
 /**
  * <p>Collection of utility methods for dealing with IO using the Sesame API</p>
@@ -94,7 +95,7 @@ public class SesameIO {
 	 * @throws ParseException if there is an error while trying to parse the data as the specified format
 	 */
 	public static ExtendedSesameRepository readRepository(InputStream theStream, RDFFormat theFormat) throws IOException, ParseException {
-		InputStreamReader aReader = new InputStreamReader(theStream);
+		InputStreamReader aReader = new InputStreamReader(theStream, Encoder.UTF8);
 
 		try {
 			return readRepository(aReader, theFormat);
@@ -163,7 +164,7 @@ public class SesameIO {
 	 * @throws ParseException if there is an error while trying to parse the data as the specified format
 	 */
 	public static ExtendedGraph readGraph(InputStream theStream, RDFFormat theFormat) throws IOException, ParseException {
-		InputStreamReader aReader = new InputStreamReader(theStream);
+		InputStreamReader aReader = new InputStreamReader(theStream, Encoder.UTF8);
 
 		try {
 			return readGraph(aReader, theFormat);
@@ -247,7 +248,7 @@ public class SesameIO {
 	 */
 	public static void writeGraph(SesameRepository theRepo, Writer theWriter, RDFFormat theFormat) throws IOException {
 		try {
-			IOUtil.transfer(new InputStreamReader(theRepo.extractRDF(theFormat, true, true, true, true)),
+			IOUtil.transfer(new InputStreamReader(theRepo.extractRDF(theFormat, true, true, true, true), Encoder.UTF8),
 							theWriter);
 		}
 		catch (AccessDeniedException e) {
